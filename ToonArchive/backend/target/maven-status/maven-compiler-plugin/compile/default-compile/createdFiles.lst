@@ -1,0 +1,10 @@
+PI\backend\config\SecurityConfig.class
+PI\backend\BackendApplication.class
+PI\backend\CorsConfig.class
+PI\backend\controllers\UsuarioController.class
+PI\backend\models\Usuario.class
+PI\backend\repositories\UsuarioRepository.class
+PI\backend\controllers\MangaController.class
+PI\backend\CorsConfig$1.class
+PI\backend\models\Manga.class
+PI\backend\repositories\MangaRepository.class
