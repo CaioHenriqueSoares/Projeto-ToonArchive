@@ -1,0 +1,31 @@
+
+  <div class="shell">
+    <div class="card" role="main" aria-labelledby="page-title">
+      <img src="assets/logo.png" alt="Toon Archive" class="logo">
+      <div class="subtitle">Entre na sua conta para continuar</div>
+
+      <form id="loginForm" novalidate>
+        <div>
+          <label for="login_identifier">E-mail ou Apelido</label>
+          <input id="login_identifier" name="login_identifier" type="text" placeholder="joaozinho@exemplo.com" required />
+        </div>
+
+        <div>
+          <label for="password_login">Senha</label>
+          <input id="password_login" name="password" type="password" placeholder="********" required />
+        </div>
+
+        <div class="note" id="errorBox" role="alert"></div>
+
+        <button class="btn" type="submit"(click) = "entrar()">Entrar</button>
+
+        <div class="helper">
+          <a href="/esqueci-senha" class="small">Esqueci minha senha</a>
+          <br>
+          Não tem conta? <a href="/cadastro" class="small">Cadastre-se</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+

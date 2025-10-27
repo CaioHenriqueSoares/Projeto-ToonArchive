@@ -1,0 +1,60 @@
+<header>
+  <a routerLink="/"><img src="assets/logo.png" alt="Toon Archive"></a>
+  <div class="icons">
+    <i>🔍</i>
+    <i>❤️</i>
+    <i>⚙️</i>
+  </div>
+</header>
+
+<main>
+  <div class="content">
+    <div class="top-section">
+      <img [src]="manga.imagem" [alt]="manga.titulo">
+      <div class="info">
+        <h2>{{ manga.titulo }}</h2>
+        <h3>por {{ manga.autor }}</h3>
+        <p>{{ manga.descricao }}</p>
+
+        <div class="tags">
+          <span *ngFor="let tag of manga.tags">{{ tag }}</span>
+        </div>
+
+        <div class="buttons">
+          <button (click)="iniciarLeitura()">Iniciar</button>
+          <button (click)="favoritar()">Favoritar</button>
+          <button (click)="avaliar()">Avaliar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter-list">
+      <h3>Capítulos</h3>
+      <div class="chapter" *ngFor="let cap of capitulos">
+        <div class="left">
+          <span class="title">{{ cap.titulo }}</span>
+          <span class="subtitle">{{ cap.subtitulo }}</span>
+        </div>
+        <div class="right">
+          📅 {{ cap.data }} · 💬 {{ cap.comentarios }} · 👁️ {{ cap.visualizacoes }}
+        </div>
+      </div>
+    </div>
+
+    <div class="comments">
+      <h3>Comentários</h3>
+      <div class="comment-box">
+        <textarea [(ngModel)]="novoComentario" placeholder="Escreva seu comentário..."></textarea>
+        <button (click)="enviarComentario()">Enviar</button>
+      </div>
+
+      <div class="comment" *ngFor="let c of comentarios">
+        <p>{{ c }}</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © 2025 Toon Archive - Todos os direitos reservados.
+</footer>
