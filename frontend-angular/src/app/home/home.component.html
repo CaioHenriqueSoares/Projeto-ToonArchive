@@ -1,0 +1,87 @@
+<!-- ===== MENU LATERAL ===== -->
+<nav id="menu-lateral" class="menu-lateral">
+  <div class="menu-logo">
+    <img src="assets/LogoToonArchive.png" alt="Toon Archive Logo">
+  </div>
+  <ul>
+    <li><button (click)="irPara('/publicar')">📖 Publicação</button></li>
+    <li>
+      <button class="idioma-btn">
+        🌐 Idioma
+        <img src="https://flagcdn.com/w20/br.png" alt="pt-BR" class="bandeira">
+      </button>
+    </li>
+    <li><button (click)="irPara('/comunidade')">💬 Comunidade</button></li>
+  </ul>
+</nav>
+
+<header>
+  <div class="header-esquerda">
+    <button class="menu-btn"(click)="toggleMenu()">☰</button>
+    <input type="text" placeholder="Buscar mangá...">
+  </div>
+
+  <div id="overlay" (click)="toggleMenu()"></div>
+
+
+  <div class="header-centro">
+    <img src="assets/LogoToonArchive.png" alt="Toon Archive" class="logo">
+  </div>
+
+  <div class="header-direita">
+    <button class="usuario-btn">👤</button>
+  </div>
+</header>
+
+<!-- ===== BANNER CARROSSEL ===== -->
+<div class="banner-carousel">
+  <div class="banner-slides" [style.transform]="'translateX(-' + slideIndex * 100 + '%)'">
+    <div class="banner-slide" *ngFor="let slide of slides; let i = index">
+      <img [src]="slide.imagem" [alt]="slide.titulo">
+      <button class="banner-btn" (click)="irPara(slide.link)"></button>
+    </div>
+  </div>
+
+  <div class="banner-indicators">
+    <span
+      class="dot"
+      *ngFor="let slide of slides; let i = index"
+      [class.active]="i === slideIndex"
+      (click)="goToSlide(i)">
+    </span>
+  </div>
+</div>
+
+<section class="catalogo">
+  <h2>Destaques:</h2>
+  <div class="destaques-container">
+    <button class="seta seta-esquerda" (click)="scrollDestaques(-300)">❮</button>
+
+    <div #destaques class="mangas">
+      <div class="manga-card" *ngFor="let manga of destaquesList">
+        <img [src]="manga.img" [alt]="manga.nome">
+        <p>{{ manga.nome }}</p>
+      </div>
+    </div>
+
+    <button class="seta seta-direita" (click)="scrollDestaques(300)">❯</button>
+  </div>
+
+  <h2>Favoritos:</h2>
+  <div class="favoritos-container">
+    <button class="seta seta-esquerda-fav" (click)="scrollFavoritos(-300)">❮</button>
+
+    <div #favoritos class="mangas">
+      <div class="manga-card" *ngFor="let manga of favoritosList">
+        <img [src]="manga.img" [alt]="manga.nome">
+        <p>{{ manga.nome }}</p>
+      </div>
+    </div>
+
+    <button class="seta seta-direita-fav" (click)="scrollFavoritos(300)">❯</button>
+  </div>
+</section>
+
+<footer>
+  ToonArchive | Seu site de mangás e HQs independentes
+</footer>
