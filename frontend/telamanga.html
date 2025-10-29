@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toon Archive - Mangá</title>
+  <link rel="icon" href="assets/favicon.ico" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #0A1014;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    main {
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .top-section {
+      display: flex;
+      gap: 25px;
+      background-color: #1B1C22;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 0 10px rgba(0,0,0,.6);
+      width: 80%;
+      max-width: 900px;
+    }
+    .top-section img {
+      width: 380px;
+      height: 480px;
+      border-radius: 12px;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.7);
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .top-section img:hover { transform: scale(1.03); }
+    .info { flex: 1; }
+    .info h2 { font-size: 26px; margin-bottom: 10px; color: #fff; }
+
+    .chapter-list {
+      margin-top: 20px;
+      background-color: #1b1b21;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 900px;
+    }
+    .chapter-list h3 { margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 6px; }
+    .chapter {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+      padding: 10px 0;
+    }
+    .chapter .title { font-weight: bold; color: #fff; }
+    .read-btn {
+      background-color: #9d4edd;
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: background .3s;
+    }
+    .read-btn:hover { background-color: #b266ff; }
+
+    /* === Comentários === */
+    .comentarios {
+      background-color: #1B1C22;
+      border-radius: 10px;
+      padding: 20px;
+      width: 80%;
+      max-width: 800px;
+      text-align: left;
+    }
+    .comentarios h3 {
+      color: #fff;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 5px;
+    }
+    .comentario-item {
+      background-color: #16161c;
+      padding: 14px 16px 10px 16px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      border: 1px solid #252525;
+      position: relative;
+      transition: all .2s ease-in-out;
+    }
+    .comentario-item:hover { background-color: #1e1e24; }
+    .comentario-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .comentario-header .autor { font-weight: bold; color: #b266ff; font-size: 15px; }
+    .comentario-acoes {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 6px;
+    }
+    .comentario-acoes button {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 2px;
+      transition: color .2s, transform .2s;
+    }
+    .comentario-acoes button:hover { color: #b266ff; transform: scale(1.1); }
+
+    .comentario-texto {
+      margin-top: 12px;
+      margin-bottom: 8px;
+      font-size: 15px;
+      color: #ddd;
+      line-height: 1.5;
+    }
+    .comentario-data {
+      font-size: 13px;
+      color: #aaa;
+      margin-top: 8px;
+      display: block;
+      text-align: right;
+    }
+
+    /* edição inline */
+    .comentario-editar-area {
+      width: 100%;
+      background-color: #111;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      resize: vertical;
+    }
+    .comentario-salvar-btn,
+    .comentario-cancelar-btn {
+      background-color: #9d4edd;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-right: 6px;
+      transition: background .3s;
+    }
+    .comentario-cancelar-btn { background-color: #333; }
+    .comentario-salvar-btn:hover { background-color: #b266ff; }
+    .comentario-cancelar-btn:hover { background-color: #555; }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      border-radius: 6px;
+      border: none;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #111;
+      color: #fff;
+      resize: none;
+      font-size: 14px;
+    }
+    button {
+      background-color: #9d4edd;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+      transition: background .3s;
+      width: 100%;
+    }
+    button:hover { background-color: #b266ff; }
+    footer { text-align: center; margin-top: 40px; padding: 15px; font-size: 14px; color: #888; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="Html-toonarchive.html"><img src="assets/logo.png" alt="Toon Archive"></a>
+  </header>
+
+  <main>
+    <div id="mangaContent"><h2>Carregando mangá...</h2></div>
+    <div id="chapterList" class="chapter-list">
+      <h3>Capítulos:</h3>
+      <div id="chapterItems"></div>
+    </div>
+
+    <div class="comentarios">
+      <h3>Comentários</h3>
+      <div id="comentariosContainer"><p>Carregando comentários...</p></div>
+      <form id="comentarioForm">
+        <textarea id="comentarioTexto" placeholder="Escreva um comentário..." required></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </main>
+  <footer>© 2025 Toon Archive - Todos os direitos reservados.</footer>
+
+  <script>
+    const API = "http://localhost:8080";
+
+    async function carregarManga() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  if (!id) return;
+
+  const resp = await fetch(`${API}/mangas/${id}`);
+  const manga = await resp.json();
+
+  // 🔹 Detecta se o usuário é admin
+  const isAdmin = localStorage.getItem("tipo") === "admin";
+
+  document.getElementById("mangaContent").innerHTML = `
+    <div class="top-section">
+      <img src="${API}${manga.capa}" alt="Capa de ${manga.nome}">
+      <div class="info">
+        <div>
+          <h2 style="word-break: break-word;">${manga.nome}</h2>
+          <h3>Autor: ${manga.autor ?? "-"}</h3>
+          <h3>Editora: ${manga.editora ?? "-"}</h3>
+          <h3>Ano: ${manga.ano ?? "-"}</h3>
+          <p style="white-space: pre-line; word-wrap: break-word; margin-top:10px;">
+            ${manga.descricao || ""}
+          </p>
+        </div>
+
+        ${
+          isAdmin
+            ? `<button class="manage-btn" onclick="window.location.href='gerenciar_capitulos.html?id=${manga.id}'">
+                ⚙️ Gerenciar Capítulos
+              </button>`
+            : ""
+        }
+      </div>
+    </div>
+  `;
+
+  carregarCapitulos(id);
+  carregarComentarios(id);
+}
+
+
+    async function carregarCapitulos(id) {
+      const container = document.getElementById("chapterItems");
+      const resp = await fetch(`${API}/capitulos/manga/${id}`);
+      const capitulos = await resp.json();
+
+      container.innerHTML = capitulos.map(cap => `
+        <div class="chapter">
+          <span class="title">Capítulo ${cap.numero} - ${cap.tituloCapitulo}</span>
+          <a class="read-btn" href="capitulo.html?id=${cap.id}">Ler</a>
+        </div>`).join("");
+    }
+
+    async function carregarComentarios(mangaId) {
+      const container = document.getElementById("comentariosContainer");
+      const resp = await fetch(`${API}/comentarios/manga/${mangaId}`);
+      const comentarios = await resp.json();
+      const apelido = localStorage.getItem("apelido");
+
+      container.innerHTML = comentarios.map(c => `
+        <div class="comentario-item" data-id="${c.id}">
+          <div class="comentario-header">
+            <span class="autor">${c.autor}</span>
+            
+            ${apelido === c.autor || localStorage.getItem("tipo") === "admin" ? `
+  <div class="comentario-acoes">
+    <button title="Editar">✏️</button>
+    <button title="Excluir">🗑️</button>
+  </div>` : ""}
+
+          </div>
+          <div class="comentario-texto">${c.texto}</div>
+          <span class="comentario-data">${new Date(c.dataHora).toLocaleString()}</span>
+        </div>`).join("");
+
+      // Edição inline
+      container.querySelectorAll(".comentario-acoes button[title='Editar']").forEach(btn => {
+        btn.addEventListener("click", e => {
+          const item = e.target.closest(".comentario-item");
+          const id = item.dataset.id;
+          const textoEl = item.querySelector(".comentario-texto");
+          const antigoTexto = textoEl.textContent.trim();
+
+          const textarea = document.createElement("textarea");
+          textarea.value = antigoTexto;
+          textarea.className = "comentario-editar-area";
+
+          const salvarBtn = document.createElement("button");
+          salvarBtn.textContent = "💾 Salvar";
+          salvarBtn.className = "comentario-salvar-btn";
+
+          const cancelarBtn = document.createElement("button");
+          cancelarBtn.textContent = "❌ Cancelar";
+          cancelarBtn.className = "comentario-cancelar-btn";
+
+          textoEl.innerHTML = "";
+          textoEl.appendChild(textarea);
+          textoEl.appendChild(salvarBtn);
+          textoEl.appendChild(cancelarBtn);
+
+          salvarBtn.addEventListener("click", async () => {
+            const novoTexto = textarea.value.trim();
+            if (novoTexto && novoTexto !== antigoTexto) {
+              await atualizarComentario(id, novoTexto, mangaId);
+            } else textoEl.textContent = antigoTexto;
+          });
+
+          cancelarBtn.addEventListener("click", () => textoEl.textContent = antigoTexto);
+        });
+      });
+
+      // === EXCLUSÃO INLINE (substitui o confirm feio) ===
+container.querySelectorAll(".comentario-acoes button[title='Excluir']").forEach(btn => {
+  btn.addEventListener("click", e => {
+    const item = e.target.closest(".comentario-item");
+    const id = item.dataset.id;
+    const textoEl = item.querySelector(".comentario-texto");
+    const antigoTexto = textoEl.textContent.trim();
+
+    // Cria painel de confirmação no lugar do texto
+    textoEl.innerHTML = `
+      </p>
+      <div style="text-align:center;">
+        <button class="comentario-salvar-btn">🗑️ Excluir</button>
+        <button class="comentario-cancelar-btn">❌ Cancelar</button>
+      </div>
+    `;
+
+    const excluirBtn = textoEl.querySelector(".comentario-salvar-btn");
+    const cancelarBtn = textoEl.querySelector(".comentario-cancelar-btn");
+
+    excluirBtn.addEventListener("click", async () => {
+      await fetch(`${API}/comentarios/${id}`, { method: "DELETE" });
+      carregarComentarios(mangaId);
+    });
+
+    cancelarBtn.addEventListener("click", () => {
+      textoEl.textContent = antigoTexto;
+    });
+  });
+});
+
+    }
+
+    async function atualizarComentario(id, novoTexto, mangaId) {
+      await fetch(`${API}/comentarios/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto: novoTexto })
+      });
+      carregarComentarios(mangaId);
+    }
+
+    async function excluirComentario(id, mangaId) {
+      await fetch(`${API}/comentarios/${id}`, { method: "DELETE" });
+      carregarComentarios(mangaId);
+    }
+
+    document.getElementById("comentarioForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const mangaId = new URLSearchParams(window.location.search).get("id");
+      const autor = localStorage.getItem("apelido") || "Anônimo";
+      const texto = document.getElementById("comentarioTexto").value.trim();
+      if (!texto) return;
+      await fetch(`${API}/comentarios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ autor, texto, manga: { id: Number(mangaId) } })
+      });
+      document.getElementById("comentarioTexto").value = "";
+      carregarComentarios(mangaId);
+    });
+
+    document.addEventListener("DOMContentLoaded", carregarManga);
+  </script>
+</body>
+</html>

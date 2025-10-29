@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Capítulo - Toon Archive</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: #111;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      color: #fff;
+    }
+
+    input {
+      width: 100%;
+      margin-bottom: 15px;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background-color: #0A1014;
+      color: #eee;
+      padding: 10px;
+    }
+
+    button {
+      background-color: #9d4edd;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.1s;
+    }
+
+    button:hover {
+      background-color: #b266ff;
+      transform: scale(1.03);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #b266ff;
+    }
+
+    /* === Preview das imagens === */
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+
+    .image-box {
+      position: relative;
+      display: inline-block;
+    }
+
+    .image-box img {
+      width: 120px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .remove-individual {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: #9d4edd;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .remove-individual:hover {
+      background-color: #b266ff;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="Html-toonarchive.html"><img src="assets/logo.png" alt="Toon Archive"></a>
+  </header>
+
+  <main>
+    <h2>Editar Capítulo</h2>
+    <form id="editForm">
+      <label for="tituloCapitulo">Título do Capítulo</label>
+      <input type="text" id="tituloCapitulo">
+
+      <label for="numero">Número do Capítulo</label>
+      <input type="text" id="numero">
+
+      <label for="paginas">Substituir Páginas (opcional)</label>
+      <input type="file" id="paginas" accept=".png,.jpg,.jpeg" multiple>
+
+      <!-- Preview das imagens -->
+      <div class="preview-container" id="previewContainer"></div>
+
+      <button type="submit">Salvar Alterações</button>
+      <a href="gerenciar_capitulos.html" class="back-link">← Voltar</a>
+    </form>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const API = "http://localhost:8080";
+
+    // 🔹 Carrega título e número do capítulo
+    async function carregarCapitulo() {
+      const resp = await fetch(`${API}/capitulos/${id}`);
+      const cap = await resp.json();
+      document.getElementById("tituloCapitulo").value = cap.tituloCapitulo || "";
+      document.getElementById("numero").value = cap.numero || "";
+
+      // Se houver páginas, exibe o preview
+      if (cap.paginas) {
+        const container = document.getElementById("previewContainer");
+        const urls = cap.paginas
+          .split(";")
+          .map(p => p.trim())
+          .filter(p => p !== "" && p.startsWith("http"));
+
+        urls.forEach(url => {
+          const box = document.createElement("div");
+          box.className = "image-box";
+
+          const img = document.createElement("img");
+          img.src = url;
+
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = "×";
+          removeBtn.className = "remove-individual";
+          removeBtn.onclick = () => box.remove();
+
+          box.appendChild(img);
+          box.appendChild(removeBtn);
+          container.appendChild(box);
+        });
+      }
+    }
+
+    // 🔹 Preview das novas imagens enviadas
+    const inputPaginas = document.getElementById("paginas");
+    const previewContainer = document.getElementById("previewContainer");
+    let selectedImages = [];
+
+    inputPaginas.addEventListener("change", function() {
+      const newFiles = Array.from(this.files);
+
+      newFiles.forEach(file => {
+        const id = Math.random().toString(36).substring(2, 10);
+        selectedImages.push({ id, file });
+
+        const box = document.createElement("div");
+        box.className = "image-box";
+        box.dataset.id = id;
+
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "×";
+        removeBtn.className = "remove-individual";
+        removeBtn.onclick = () => {
+          selectedImages = selectedImages.filter(f => f.id !== id);
+          box.remove();
+          if (selectedImages.length === 0) inputPaginas.value = "";
+        };
+
+        box.appendChild(img);
+        box.appendChild(removeBtn);
+        previewContainer.appendChild(box);
+      });
+    });
+
+    // 🔹 Salvar alterações
+    document.getElementById("editForm").addEventListener("submit", async e => {
+      e.preventDefault();
+
+      const numeroNovo = document.getElementById("numero").value.trim();
+      try {
+        const resp = await fetch(`${API}/capitulos/manga/${id.split("-")[0] || 0}`);
+        const lista = await resp.json();
+        const jaExiste = lista.some(c => c.numero == numeroNovo && c.id != id);
+        if (jaExiste) {
+          alert("❌ Já existe um capítulo com este número! Use outro (ex: 5.5).");
+          return;
+        }
+      } catch (err) {
+        console.error("Erro ao validar número:", err);
+      }
+
+      const formData = new FormData();
+      formData.append("tituloCapitulo", document.getElementById("tituloCapitulo").value);
+      formData.append("numero", document.getElementById("numero").value);
+
+      const arquivos = document.getElementById("paginas").files;
+      for (let file of arquivos) formData.append("paginas", file);
+
+      const resp = await fetch(`${API}/capitulos/${id}`, { method: "PUT", body: formData });
+      if (resp.ok) {
+        alert("✅ Capítulo atualizado com sucesso!");
+        window.history.back();
+      } else {
+        alert("❌ Erro ao atualizar capítulo.");
+      }
+    });
+
+    async function ajustarBotaoVoltar() {
+  try {
+    const resp = await fetch(`${API}/capitulos/${id}`);
+    const cap = await resp.json();
+
+    if (cap.manga && cap.manga.id) {
+      const mangaId = cap.manga.id;
+      const backLink = document.querySelector(".back-link");
+
+      // 🔹 Define corretamente o link
+      if (backLink) {
+        backLink.href = `gerenciar_capitulos.html?id=${mangaId}`;
+        console.log(`✅ Botão Voltar ajustado: gerenciar_capitulos.html?id=${mangaId}`);
+      }
+    } else {
+      console.warn("⚠️ Nenhum mangá encontrado no capítulo retornado.");
+    }
+  } catch (err) {
+    console.error("❌ Erro ao ajustar botão Voltar:", err);
+  }
+}
+
+// 🔹 Executa após o carregamento do DOM
+document.addEventListener("DOMContentLoaded", async () => {
+  await carregarCapitulo();
+  await ajustarBotaoVoltar(); // só define o link após buscar o capítulo
+});
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toon Archive - Publicar Mangá</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #0a0a0f;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    header img {
+  max-width: 200px;     
+  height: auto;          
+  display: block;
+  margin: 25px auto;
+  object-fit: contain;  
+}
+
+    .form-container {
+      background-color: #18181f;
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+
+    h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background-color: #0f0f14;
+      color: #fff;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: none;
+      height: 100px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #9d4edd;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 20px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #b06fff;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      color: #ccc;
+      margin-top: 10px;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: #9d4edd;
+    }
+
+    .cover-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .cover-preview img {
+      width: 180px;
+      height: auto;
+      border-radius: 10px;
+      margin-top: 10px;
+      box-shadow: 0 0 8px #000;
+      transition: transform 0.2s;
+    }
+
+    .cover-preview img:hover {
+      transform: scale(1.03);
+    }
+
+    .remove-cover-btn {
+      margin-top: 8px;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .remove-cover-btn:hover {
+      background-color: #9d4edd;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="Html-toonarchive.html"><img src="assets/logo.png" alt="Toon Archive" /></a>
+  </header>
+
+  <main>
+    <div class="form-container">
+      <h2>Publicar Nova Obra</h2>
+      <form id="mangaForm">
+        <!-- Nome -->
+        <label for="nome">Nome da Obra</label>
+        <input type="text" id="nome" name="nome" placeholder="Ex: SPY×FAMILY" required />
+
+        <!-- Autor -->
+        <label for="autor">Autor</label>
+        <input type="text" id="autor" name="autor" placeholder="Ex: Endou Tatsuya" required />
+
+        <!-- Editora -->
+        <label for="editora">Editora</label>
+        <input type="text" id="editora" name="editora" placeholder="Ex: Shueisha" required />
+
+        <!-- Ano -->
+        <label for="ano">Ano de Lançamento</label>
+        <input type="number" id="ano" name="ano" placeholder="Ex: 2019" min="1900" max="2099" required />
+
+        <!-- Descrição -->
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" name="descricao" placeholder="Escreva uma breve sinopse da obra..." required></textarea>
+
+        <!-- Capa -->
+        <label for="capa">Capa da Obra</label>
+        <input type="file" id="capa" name="capa" accept=".png, .jpg, .jpeg" required />
+        <div class="cover-preview" id="coverPreview"></div>
+
+        <button type="submit">Publicar Mangá</button>
+        <a href="Html-toonarchive.html" class="back-link">← Voltar para página inicial</a>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Toon Archive - Todos os direitos reservados.
+  </footer>
+
+  <script>
+    // --- Preview da capa ---
+    const capaInput = document.getElementById("capa");
+    const coverPreview = document.getElementById("coverPreview");
+
+    capaInput.addEventListener("change", function () {
+      coverPreview.innerHTML = "";
+      const file = this.files[0];
+      if (file) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        coverPreview.appendChild(img);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remover capa";
+        removeBtn.className = "remove-cover-btn";
+        removeBtn.onclick = () => {
+          capaInput.value = "";
+          coverPreview.innerHTML = "";
+        };
+        coverPreview.appendChild(removeBtn);
+      }
+    });
+
+    // --- Envio ao backend ---
+    document.getElementById("mangaForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("nome", document.getElementById("nome").value);
+      formData.append("autor", document.getElementById("autor").value);
+      formData.append("editora", document.getElementById("editora").value);
+      formData.append("ano", document.getElementById("ano").value);
+      formData.append("descricao", document.getElementById("descricao").value);
+
+      if (capaInput.files[0]) {
+        formData.append("capa", capaInput.files[0]);
+      }
+
+      try {
+        const resposta = await fetch("http://localhost:8080/mangas", {
+          method: "POST",
+          body: formData
+        });
+
+        if (resposta.ok) {
+          alert("Mangá publicado com sucesso!");
+          window.location.href = "Html-toonarchive.html";
+        } else {
+          alert("Erro ao publicar o mangá!");
+        }
+      } catch (erro) {
+        alert("Erro de conexão com o servidor!");
+        console.error(erro);
+      }
+    });
+  </script>
+</body>
+</html>

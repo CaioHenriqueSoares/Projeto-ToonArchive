@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Capítulos - Toon Archive</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    main {
+      max-width: 900px;
+      margin: 50px auto;
+      background-color: #111;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      color: #fff;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .chapter-item {
+      background-color: #1a1a1a;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s;
+      gap: 25px; /* 🔹 Espaçamento entre nome e botões */
+    }
+
+    .chapter-item div {
+      display: flex;
+      gap: 10px; /* 🔹 Espaçamento entre Editar e Excluir */
+    }
+
+    .chapter-item:hover {
+      background-color: #2a2a2a;
+    }
+
+    button {
+      background-color: #9d4edd;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.1s;
+    }
+
+    button:hover {
+      background-color: #b266ff;
+      transform: scale(1.05);
+    }
+
+    .delete-btn {
+      background-color: #c0392b;
+    }
+
+    .delete-btn:hover {
+      background-color: #e74c3c;
+    }
+
+    .add-btn {
+      display: block;
+      width: 100%;
+      margin-top: 25px;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      color: #b266ff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="Html-toonarchive.html"><img src="assets/logo.png" alt="Toon Archive"></a>
+  </header>
+
+  <main>
+    <h2>Gerenciar Capítulos</h2>
+    <div id="chapterList">Carregando capítulos...</div>
+    <button class="add-btn" onclick="adicionarCapitulo()">➕ Adicionar Novo Capítulo</button>
+    <a href="Html-toonarchive.html" class="back-link">← Voltar</a>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const mangaId = params.get("id");
+    const API = "http://localhost:8080";
+
+    // 🔹 Buscar capítulos do mangá
+    async function carregarCapitulos() {
+      const container = document.getElementById("chapterList");
+      container.innerHTML = "<p>Carregando capítulos...</p>";
+
+      try {
+        const resp = await fetch(`${API}/capitulos/manga/${mangaId}`);
+        if (!resp.ok) throw new Error("Erro ao buscar capítulos");
+
+        const lista = await resp.json();
+        container.innerHTML = "";
+
+        if (lista.length === 0) {
+          container.innerHTML = "<p>Nenhum capítulo encontrado.</p>";
+          return;
+        }
+
+        lista.sort((a, b) => a.numero - b.numero);
+
+        lista.forEach(cap => {
+          const div = document.createElement("div");
+          div.className = "chapter-item";
+          div.innerHTML = `
+            <span><strong>${cap.tituloCapitulo || "Capítulo " + (cap.numero || "?")}</strong></span>
+            <div>
+              <button onclick="editarCapitulo(${cap.id})">✏️ Editar</button>
+              <button class="delete-btn" onclick="deletarCapitulo(${cap.id}, '${cap.tituloCapitulo}')">❌ Excluir</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (erro) {
+        console.error("Erro ao carregar capítulos:", erro);
+        container.innerHTML = "<p>Falha ao carregar capítulos.</p>";
+      }
+    }
+
+    // 🔹 Excluir capítulo
+    async function deletarCapitulo(id, titulo) {
+      const confirmacao = confirm(`Tem certeza que deseja excluir o capítulo "${titulo}"?`);
+      if (!confirmacao) return;
+
+      try {
+        const resp = await fetch(`${API}/capitulos/${id}`, { method: "DELETE" });
+        if (!resp.ok) throw new Error("Erro ao excluir capítulo");
+
+        alert("✅ Capítulo excluído com sucesso!");
+        carregarCapitulos();
+      } catch (erro) {
+        console.error("Erro ao excluir capítulo:", erro);
+        alert("❌ Não foi possível excluir o capítulo.");
+      }
+    }
+
+    // 🔹 Editar
+    function editarCapitulo(id) {
+      window.location.href = `editar_capitulo.html?id=${id}`;
+    }
+
+    // 🔹 Adicionar novo
+    function adicionarCapitulo() {
+      window.location.href = `publicar_capitulo.html?mangaId=${mangaId}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", carregarCapitulos);
+  </script>
+</body>
+</html>

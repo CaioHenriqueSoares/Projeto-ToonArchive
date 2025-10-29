@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Toon Archive</title>
+  <style>
+    body {
+      background-color: #1b1b1f;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #0a1014;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #9d4edd;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #222;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+      color: #9d4edd;
+      text-align: center;
+    }
+
+    .login-section input {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .login-section button {
+      width: 100%;
+      padding: 10px;
+      background: #9d4edd;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .manga-list {
+      margin-top: 30px;
+    }
+
+    .manga-card {
+      display: flex;
+      align-items: center;
+      background-color: #111;
+      border-radius: 8px;
+      margin: 10px 0;
+      padding: 10px;
+      justify-content: space-between;
+    }
+
+    .manga-card img {
+      width: 80px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-right: 10px;
+    }
+
+    .delete-btn {
+      background: #ff4b4b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      color: #ccc;
+    }
+  </style>
+</head>
+
+<body>
+  <header>👑 Painel Administrativo</header>
+
+  <main>
+    <section class="login-section" id="loginSection">
+      <h2>Login do Administrador</h2>
+      <input type="email" id="email" placeholder="Usuario" required>
+      <input type="password" id="senha" placeholder="Senha" required>
+      <button onclick="loginAdmin()">Entrar</button>
+      <p id="loginStatus"></p>
+    </section>
+
+    <section class="manga-list" id="adminPanel" style="display:none;">
+      <h2>Obras Publicadas</h2>
+      <div id="mangaContainer">
+        <p>Carregando obras...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Toon Archive © 2025 - Painel Administrativo</footer>
+
+  <script>
+  async function loginAdmin() {
+    const login = document.getElementById("email").value; // usa o input existente
+    const senha = document.getElementById("senha").value;
+    const status = document.getElementById("loginStatus");
+
+    const resposta = await fetch("http://localhost:8080/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ login, senha }) // 👈 campo trocado de "email" para "login"
+    });
+
+    const texto = await resposta.text();
+
+    if (texto === "OK") {
+      status.textContent = "Login bem-sucedido!";
+      status.style.color = "lime";
+      document.getElementById("loginSection").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+      carregarObras();
+    } else {
+      status.textContent = "Credenciais inválidas.";
+      status.style.color = "red";
+    }
+  }
+
+
+    async function carregarObras() {
+      const container = document.getElementById("mangaContainer");
+      try {
+        const resposta = await fetch("http://localhost:8080/mangas");
+        const mangas = await resposta.json();
+        container.innerHTML = "";
+
+        mangas.forEach((m) => {
+          const div = document.createElement("div");
+          div.className = "manga-card";
+
+          const img = document.createElement("img");
+          img.src = m.capa ? `http://localhost:8080${m.capa}` : "placeholder.png";
+
+
+          const nome = document.createElement("span");
+          nome.textContent = m.nome;
+
+          const btn = document.createElement("button");
+          btn.className = "delete-btn";
+          btn.textContent = "Remover";
+          btn.onclick = () => removerManga(m.id);
+
+          div.appendChild(img);
+          div.appendChild(nome);
+          div.appendChild(btn);
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Erro ao carregar obras:", err);
+        container.innerHTML = "<p>Erro ao carregar obras.</p>";
+      }
+    }
+
+    async function removerManga(id) {
+      if (!confirm("Tem certeza que deseja remover esta obra?")) return;
+      await fetch(`http://localhost:8080/mangas/${id}`, { method: "DELETE" });
+      carregarObras();
+    }
+  </script>
+</body>
+</html>

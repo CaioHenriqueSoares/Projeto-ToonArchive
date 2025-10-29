@@ -1,0 +1,576 @@
+/* ==========================
+   ESTILO GERAL
+========================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #0A1014;
+  color: #ddd;
+}
+
+/* ==========================
+   CABEÇALHO AJUSTADO
+========================== */
+header {
+  background-color: #25252C;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 30px; /* altura menor */
+  border-bottom: 1px solid #333;
+}
+
+header a img {
+  height: 80px; /* logo menor */
+  transition: transform 0.2s;
+}
+
+header a img:hover {
+  transform: scale(1.05);
+}
+
+header .icons i {
+  margin-left: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+header .icons i:hover {
+  transform: scale(1.1);
+}
+
+/* ==========================
+   CONTEÚDO PRINCIPAL
+========================== */
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* ==========================
+   SEÇÃO DE MANGÁ
+========================== */
+.content {
+  max-width: 900px;
+  width: 100%;
+  background-color: #25252C;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 0 10px #000;
+}
+
+.top-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.top-section img {
+  width: 200px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+}
+
+.info h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.info h3 {
+  font-size: 16px;
+  color: #bbb;
+  margin-bottom: 15px;
+}
+
+.info p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.tags span {
+  display: inline-block;
+  background-color: #1a1a1a;
+  color: #ccc;
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+/* ==========================
+   BOTÕES
+========================== */
+.buttons {
+  margin-top: 15px;
+}
+
+.buttons button,
+.comment-box button,
+form button {
+  background-color: #7b2cbf;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.buttons button:hover,
+.comment-box button:hover,
+form button:hover {
+  background-color: #9d4edd;
+}
+
+/* ==========================
+   COMENTÁRIOS
+========================== */
+.comments {
+  margin-top: 50px;
+}
+
+.comments h3 {
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.comment-box {
+  background-color: #1a1a1a;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.comment-box textarea {
+  width: 100%;
+  height: 80px;
+  background-color: #0A1014;
+  border: 1px solid #333;
+  color: #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  resize: none;
+  font-size: 14px;
+}
+
+/* ==========================
+   FORMULÁRIO DE PUBLICAÇÃO
+========================== */
+.form-container {
+  background-color: #25252C;
+  width: 100%;
+  max-width: 700px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #000;
+}
+
+h2 {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 25px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 14px;
+  color: #ccc;
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+
+input,
+textarea,
+select {
+  background-color: #0A1014;
+  color: #eee;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+}
+
+textarea {
+  resize: none;
+  height: 120px;
+}
+
+input[type="file"] {
+  padding: 6px;
+  background-color: #0A1014;
+  border: 1px solid #333;
+}
+
+/* ==========================
+   LINK "VOLTAR"
+========================== */
+.back-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #aaa;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.back-link:hover {
+  color: #9d4edd;
+}
+
+/* ==========================
+   LISTA DE CAPÍTULOS
+========================== */
+.chapter-list {
+  margin-top: 40px;
+}
+
+.chapter-list h3 {
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.chapter {
+  display: flex;
+  justify-content: space-between;
+  background-color: #1a1a1a;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.chapter:hover {
+  background-color: #2e2e2e;
+}
+
+.chapter .left {
+  display: flex;
+  flex-direction: column;
+}
+
+.chapter .title {
+  font-weight: bold;
+  color: #fff;
+}
+
+.chapter .subtitle {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.chapter .right {
+  font-size: 13px;
+  color: #888;
+}
+
+/* ==========================
+   CAPÍTULOS - ESTILO MANGAPLUS / WEBTOON COM ESPAÇAMENTO
+========================== */
+.chapter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1a1a1a;
+  padding: 18px 30px; /* mais espaço lateral */
+  border-radius: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  gap: 30px; /* 🔹 cria distância real entre o texto e o botão */
+}
+
+.chapter:hover {
+  background-color: #232323;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(157, 78, 221, 0.3);
+}
+
+.chapter .left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chapter .title {
+  font-weight: 700;
+  color: #fff;
+  font-size: 18px;
+}
+
+.chapter .subtitle {
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* 🔹 Botão “Ler” estilizado */
+.read-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #9d4edd, #7b2cbf);
+  color: #fff;
+  padding: 10px 26px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  box-shadow: 0 0 15px rgba(157, 78, 221, 0.35);
+  transition: all 0.3s ease;
+}
+
+.read-btn:hover {
+  background: linear-gradient(135deg, #b266ff, #9d4edd);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.6);
+}
+
+/* 🔸 Ícone do botão */
+.read-btn::before {
+  content: "📖";
+  font-size: 17px;
+}
+
+
+
+
+
+/* ==========================
+   ABAS (CAPÍTULOS / COMENTÁRIOS)
+========================== */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.tab-button {
+  background-color: #1f1f1f;
+  color: #fff;
+  border: none;
+  padding: 10px 25px;
+  margin: 0 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.tab-button.active {
+  background-color: #9d4edd;
+}
+
+.tab-content {
+  display: none;
+  padding: 20px;
+  text-align: center;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ==========================
+   COMENTÁRIOS (ATUALIZADO)
+========================== */
+.comentarios {
+  background-color: #1B1C22;
+  border-radius: 10px;
+  padding: 20px;
+  width: 80%;
+  max-width: 800px;
+  text-align: left;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.comentarios h3 {
+  color: #fff;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+/* Cartões individuais */
+.comentario-item {
+  background-color: #16161c;
+  padding: 14px 16px 10px 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid #252525;
+  position: relative;
+  transition: all .2s ease-in-out;
+}
+
+.comentario-item:hover {
+  background-color: #1e1e24;
+}
+
+.comentario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comentario-header .autor {
+  font-weight: bold;
+  color: #b266ff;
+  font-size: 15px;
+}
+
+.comentario-acoes {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.comentario-acoes button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px;
+  transition: color .2s, transform .2s;
+}
+
+.comentario-acoes button:hover {
+  color: #b266ff;
+  transform: scale(1.1);
+}
+
+.comentario-texto {
+  margin-top: 12px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+.comentario-data {
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 8px;
+  display: block;
+  text-align: right;
+}
+
+/* Formulário de envio */
+.comentarios form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comentarios textarea {
+  width: 100%;
+  height: 80px;
+  background-color: #0A1014;
+  color: #ddd;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  resize: none;
+  font-size: 14px;
+}
+
+.comentarios button {
+  width: 100%; /* 🔹 agora ocupa toda a largura da textarea */
+  background-color: #9d4edd;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.comentarios button:hover {
+  background-color: #b266ff;
+}
+
+
+/* ==========================
+   RODAPÉ
+========================== */
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  border-top: 1px solid #222;
+  margin-top: 40px;
+}
+
+/* ===== MENU DO USUÁRIO ===== */
+.menu-usuario {
+  position: absolute;
+  top: 50px; /* aparece logo abaixo do botão 👤 */
+  right: 0;
+  background-color: #1b1c22;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  padding: 12px;
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 180px;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+.menu-usuario.ativo {
+  display: flex;
+}
+
+.menu-usuario p {
+  color: #fff;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  text-align: left;
+}
+
+.menu-usuario button {
+  background-color: #7b2cbf;
+  border: none;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 6px;
+  width: 100%;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.25s ease;
+}
+
+.menu-usuario button:hover {
+  background-color: #9d4edd;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

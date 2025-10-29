@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toon Archive</title>
+  <style>
+    body {
+      background-color: #25252C;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #0A1014;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      position: relative;
+    }
+
+    .header-esquerda, .header-direita {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-centro {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .menu-btn, .usuario-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .menu-btn:hover, .usuario-btn:hover { transform: scale(1.1); }
+
+    header input {
+      border: none;
+      border-radius: 5px;
+      padding: 6px 10px;
+      outline: none;
+      width: 160px;
+    }
+
+    .logo { height: 100px; width: auto; object-fit: contain; }
+
+    footer {
+      background-color: #193259;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 30px;
+    }
+
+    /* ===== MENU USUÁRIO ===== */
+    .menu-usuario {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background-color: #1b1c22;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 180px;
+      z-index: 9999;
+      animation: fadeIn 0.2s ease;
+    }
+    .menu-usuario.ativo { display: flex; }
+
+    .menu-usuario p {
+      color: #fff;
+      font-weight: 600;
+      margin: 0 0 10px 0;
+      font-size: 15px;
+    }
+
+    .menu-usuario button {
+      background-color: #7b2cbf;
+      border: none;
+      color: white;
+      padding: 8px 10px;
+      border-radius: 6px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.25s ease;
+    }
+    .menu-usuario button:hover { background-color: #9d4edd; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== MENU LATERAL ===== */
+    .menu-lateral {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100vh;
+      background-color: #0A1014;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+      transition: left 0.3s ease;
+      z-index: 1000;
+      padding-top: 60px;
+    }
+    .menu-lateral.ativo { left: 0; }
+
+    .menu-lateral ul { list-style: none; padding: 0; margin: 0; }
+    .menu-lateral button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      width: 100%;
+      text-align: left;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .menu-lateral button:hover { background-color: #193259; }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      z-index: 999;
+    }
+    #overlay.ativo { display: block; }
+
+    /* ===== Banner ===== */
+    .banner-carousel {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      margin: 20px auto;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+    .banner-slides { display: flex; transition: transform 0.8s ease; }
+    .banner-slide { min-width: 100%; position: relative; }
+    .banner-slide img { width: 100%; height: 350px; object-fit: cover; }
+    .banner-indicators {
+      position: absolute; bottom: 15px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 2;
+    }
+    .dot {
+      width: 12px; height: 12px;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 50%; cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .dot.active { background-color: white; }
+
+    .catalogo { padding: 20px; }
+    h2 { color: white; }
+
+    .mangas {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      gap: 15px;
+      padding: 10px;
+      scrollbar-width: none;
+      width: 100%;
+    }
+    .mangas::-webkit-scrollbar { display: none; }
+
+    .manga-card {
+      background-color: #0A1014;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      width: 150px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .manga-card:hover { transform: scale(1.05); }
+    .manga-card img { width: 100%; height: 220px; object-fit: cover; }
+    .manga-card p {
+      text-align: center; background: rgba(0,0,0,0.7);
+      color: white; padding: 6px; font-weight: bold;
+      margin: 0; font-size: 14px;
+    }
+
+  /* ===== Resultados de busca ===== */
+.header-esquerda {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== Campo de busca e resultados ===== */
+.busca-container {
+  position: relative; /* 🔹 define o ponto de referência para o dropdown */
+  display: inline-block;
+}
+
+#campoBusca {
+  width: 220px;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  outline: none;
+  background-color: #fff;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+#resultadosBusca {
+  position: absolute;
+  top: calc(100% + 6px); /* 🔹 logo abaixo da barra */
+  left: 0; /* 🔹 exatamente alinhado com o input */
+  width: 100%; /* 🔹 mesma largura do input */
+  background: #1B1C22;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: white;
+  z-index: 900;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+}
+
+#resultadosBusca.mostrar {
+  display: flex;
+}
+
+#resultadosBusca div {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #2a2a2a;
+  transition: background 0.2s;
+}
+
+#resultadosBusca div:hover {
+  background-color: #2b2b33;
+}
+
+
+/* ===== Modal de Logout ===== */
+.logout-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+}
+
+.logout-modal.ativo {
+  display: flex;
+}
+
+.logout-content {
+  background: #1b1c22;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  text-align: center;
+  color: white;
+  width: 280px;
+}
+
+.logout-content p {
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.logout-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logout-buttons .btn-ok {
+  background: #9d4edd;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout-buttons .btn-ok:hover {
+  background: #b266ff;
+}
+
+.logout-buttons .btn-cancel {
+  background: #333;
+  border: none;
+  color: #ccc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout-buttons .btn-cancel:hover {
+  background: #555;
+}
+/* ===== Setas de Navegação ===== */
+.seta {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  z-index: 2;
+  transition: background-color 0.3s;
+}
+
+.seta:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.seta-esquerda { left: -5px; }
+.seta-direita { right: -5px; }
+
+.destaques-container,
+.recentes-container,
+.favoritos-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+
+  </style>
+</head>
+
+<body>
+
+<header>
+ <div class="header-esquerda">
+  <button class="menu-btn">☰</button>
+  <div class="busca-container">
+    <input type="text" id="campoBusca" placeholder="Buscar mangá...">
+    <div id="resultadosBusca"></div>
+  </div>
+</div>
+
+
+  <div class="header-centro">
+    <img src="assets/logo.png" alt="Toon Archive" class="logo">
+  </div>
+
+  <div class="header-direita" style="position: relative;">
+    <button id="usuarioBtn" class="usuario-btn">👤</button>
+    <div id="menuUsuario" class="menu-usuario">
+      <p id="usuarioNome"></p>
+      <button id="logoutBtn">Sair</button>
+    </div>
+  </div>
+</header>
+
+<nav id="menu-lateral" class="menu-lateral">
+  <ul>
+    <li><button onclick="window.location.href='publicar.html'">📖 Publicação</button></li>
+    <li><button>🌐 Idioma</button></li>
+    <li><button onclick="window.location.href='comunidade.html'">💬 Comunidade</button></li>
+  </ul>
+</nav>
+<div id="overlay"></div>
+
+<div class="banner-carousel">
+  <div class="banner-slides">
+    <div class="banner-slide"><img src="assets/BannerGachakuta.png"></div>
+    <div class="banner-slide"><img src="assets/BannerConstantine.png"></div>
+    <div class="banner-slide"><img src="assets/BannerBleach.png"></div>
+  </div>
+  <div class="banner-indicators">
+    <span class="dot active" onclick="goToSlide(0)"></span>
+    <span class="dot" onclick="goToSlide(1)"></span>
+    <span class="dot" onclick="goToSlide(2)"></span>
+  </div>
+</div>
+<section class="catalogo">
+  <h2>📢 Recém-lançados:</h2>
+  <div class="recentes-container">
+    <button class="seta seta-esquerda" onclick="rolar('recentes', -1)">&#10094;</button>
+    <div id="recentes" class="mangas"></div>
+    <button class="seta seta-direita" onclick="rolar('recentes', 1)">&#10095;</button>
+  </div>
+
+  <h2>🔥 Destaques:</h2>
+  <div class="destaques-container">
+    <button class="seta seta-esquerda" onclick="rolar('destaques', -1)">&#10094;</button>
+    <div id="destaques" class="mangas">
+      <div class="manga-card"><img src="assets/CapaMangaBleach.png"><p>Bleach</p></div>
+      <div class="manga-card"><img src="assets/CapaMangaSoloLeveling.png"><p>Solo Leveling</p></div>
+      <div class="manga-card"><img src="assets/CapaMangaGachiakuta.png"><p>Gachiakuta</p></div>
+    </div>
+    <button class="seta seta-direita" onclick="rolar('destaques', 1)">&#10095;</button>
+  </div>
+
+  <h2>⭐ Favoritos:</h2>
+  <div class="favoritos-container">
+    <button class="seta seta-esquerda" onclick="rolar('favoritos', -1)">&#10094;</button>
+    <div id="favoritos" class="mangas">
+      <div class="manga-card"><img src="assets/CapaHqMotoqueiroFantasma.png"><p>Motoqueiro Fantasma</p></div>
+      <div class="manga-card"><img src="assets/CapaHqTartarugasNinja.png"><p>Tartarugas Ninjas</p></div>
+      <div class="manga-card"><img src="assets/CapaMangaGkkg.png"><p>Gokurakugai</p></div>
+      
+    </div>
+    <button class="seta seta-direita" onclick="rolar('favoritos', 1)">&#10095;</button>
+  </div>
+</section>
+
+
+<footer>© 2025 Toon Archive - Todos os direitos reservados.</footer>
+
+<script>
+const API_BASE = "http://localhost:8080";
+
+// === MENU LATERAL ===
+const menuBtn = document.querySelector('.menu-btn');
+const menu = document.getElementById('menu-lateral');
+const overlay = document.getElementById('overlay');
+menuBtn.onclick = () => { menu.classList.toggle('ativo'); overlay.classList.toggle('ativo'); };
+overlay.onclick = () => { menu.classList.remove('ativo'); overlay.classList.remove('ativo'); };
+
+// === CARROSSEL ===
+const slides = document.querySelectorAll('.banner-slide');
+const dots = document.querySelectorAll('.dot');
+let current = 0;
+function showSlide(index) {
+  if (index >= slides.length) index = 0;
+  if (index < 0) index = slides.length - 1;
+  document.querySelector('.banner-slides').style.transform = `translateX(-${index * 100}%)`;
+  dots.forEach((d,i)=>d.classList.toggle('active',i===index));
+  current = index;
+}
+setInterval(()=>showSlide(current+1),5000);
+
+// === RECÉM-LANÇADOS ===
+async function carregarRecentes() {
+  const container = document.getElementById("recentes");
+  container.innerHTML = "<p style='color:#fff'>Carregando...</p>";
+  try {
+    const resp = await fetch(`${API_BASE}/mangas`);
+    const mangas = await resp.json();
+    container.innerHTML = "";
+    mangas.sort((a,b)=>new Date(b.dataPublicacao||0)-new Date(a.dataPublicacao||0));
+    mangas.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "manga-card";
+      div.onclick = () => window.location.href = `telamanga.html?id=${m.id}`;
+      const img = document.createElement("img");
+      img.src = m.capa ? `${API_BASE}${m.capa}` : "assets/placeholder.png";
+      const p = document.createElement("p");
+      p.textContent = m.nome || "Sem título";
+      div.appendChild(img);
+      div.appendChild(p);
+      container.appendChild(div);
+    });
+  } catch {
+    container.innerHTML = "<p style='color:#fff'>Erro ao carregar obras.</p>";
+  }
+}
+document.addEventListener("DOMContentLoaded", carregarRecentes);
+
+// === BUSCA ===
+const campoBusca = document.getElementById("campoBusca");
+const resultadosBusca = document.getElementById("resultadosBusca");
+
+campoBusca.addEventListener("input", async () => {
+  const termo = campoBusca.value.trim();
+  if (termo.length < 2) { resultadosBusca.innerHTML = ""; resultadosBusca.classList.remove("mostrar"); return; }
+
+  try {
+    const resp = await fetch(`${API_BASE}/mangas/buscar?nome=${encodeURIComponent(termo)}`);
+    const mangas = await resp.json();
+    if (mangas.length === 0) {
+      resultadosBusca.innerHTML = "<div>Nenhum mangá encontrado.</div>";
+    } else {
+      resultadosBusca.innerHTML = mangas.map(m =>
+        `<div onclick="window.location.href='telamanga.html?id=${m.id}'">
+           <strong>${m.nome}</strong><br><small>${m.autor || "Autor desconhecido"}</small>
+         </div>`).join("");
+    }
+    resultadosBusca.classList.add("mostrar");
+  } catch {
+    resultadosBusca.innerHTML = "<div>Erro ao buscar.</div>";
+    resultadosBusca.classList.add("mostrar");
+  }
+});
+
+// === LOGIN / USUÁRIO ===
+window.addEventListener("DOMContentLoaded", () => {
+  const usuarioBtn = document.getElementById("usuarioBtn");
+  const menuUsuario = document.getElementById("menuUsuario");
+  const usuarioNome = document.getElementById("usuarioNome");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const apelido = localStorage.getItem("apelido");
+
+  if (apelido) {
+    usuarioNome.textContent = apelido;
+    usuarioBtn.addEventListener("click", (e) => { e.stopPropagation(); menuUsuario.classList.toggle("ativo"); });
+    menuUsuario.addEventListener("click", (e) => e.stopPropagation());
+    document.addEventListener("click", (e) => { if (!menuUsuario.contains(e.target) && e.target !== usuarioBtn) menuUsuario.classList.remove("ativo"); });
+    // === MODAL DE LOGOUT ===
+const logoutModal = document.getElementById("logoutModal");
+const confirmLogout = document.getElementById("confirmLogout");
+const cancelLogout = document.getElementById("cancelLogout");
+
+logoutBtn.addEventListener("click", () => {
+  logoutModal.classList.add("ativo");
+});
+
+confirmLogout.addEventListener("click", () => {
+  localStorage.removeItem("apelido");
+  localStorage.removeItem("tipo");
+  window.location.reload();
+});
+
+cancelLogout.addEventListener("click", () => {
+  logoutModal.classList.remove("ativo");
+});
+
+  } else {
+    usuarioBtn.addEventListener("click", () => { window.location.href = "login.html"; });
+  }
+});
+
+// === FUNÇÃO DE ROLAR LISTAS COM SETAS ===
+function rolar(id, direcao) {
+  const container = document.getElementById(id);
+  if (!container) return;
+  
+  const scrollAmount = 300; // Quantos pixels andar por clique
+  container.scrollBy({
+    left: scrollAmount * direcao,
+    behavior: "smooth"
+  });
+}
+
+
+</script>
+
+<!-- Modal de confirmação de logout -->
+<div id="logoutModal" class="logout-modal">
+  <div class="logout-content">
+    <p>Deseja sair?</p>
+    <div class="logout-buttons">
+      <button id="confirmLogout" class="btn-ok">Sim</button>
+      <button id="cancelLogout" class="btn-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

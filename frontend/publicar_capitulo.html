@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toon Archive - Publicar Capítulo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #0A1014;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    main {
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-container {
+      background-color: #1B1C22;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #ccc;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background-color: #0A1014;
+      color: #eee;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      cursor: pointer;
+    }
+
+    button {
+      width: 100%;
+      background-color: #9d4edd;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #b266ff;
+      transform: scale(1.03);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      color: #b266ff;
+      text-decoration: none;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .image-box {
+      position: relative;
+      display: inline-block;
+    }
+
+    .image-box img {
+      width: 110px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+    }
+
+   .remove-individual {
+  position: absolute;
+  top: -10px;             
+  right: -10px;           
+  background-color: #9d4edd;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.remove-individual:hover {
+  background-color: #b266ff;
+  transform: scale(1.1);
+}
+
+    /* === Avisos inline === */
+    .msg {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(0,0,0,.35);
+      border: 1px solid transparent;
+      animation: msg-in .2s ease-out;
+    }
+    .msg.show { display: block; }
+    .msg--ok   { background:#132012; color:#b0ffb0; border-color:#2a7032; }
+    .msg--err  { background:#261318; color:#ffb0bf; border-color:#6e1f34; }
+    .msg--warn { background:#241e11; color:#ffe6ae; border-color:#7a5b1a; }
+
+    .msg small { display:block; opacity:.8; font-weight:500; margin-top:4px; }
+
+    @keyframes msg-in {
+      from { opacity:0; transform: translateY(-6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="#">
+      <img src="assets/logo.png" alt="Toon Archive">
+    </a>
+  </header>
+
+  <main>
+    <div class="form-container">
+      <h2>Adicionar Novo Capítulo</h2>
+
+      <!-- Caixa de mensagens inline -->
+      <div id="msgBox" class="msg" role="alert" aria-live="polite"></div>
+
+      <form id="capituloForm">
+        <label for="tituloCapitulo">Título do Capítulo</label>
+        <input type="text" id="tituloCapitulo" name="tituloCapitulo" placeholder="Ex: A Verdade" required>
+
+        <label for="numero">Número do Capítulo</label>
+        <input type="number" id="numero" name="numero" placeholder="Ex: 1 ou 5.5" min="1" step="0.1" lang="en" required>
+
+        <label for="paginas">Enviar Páginas (PNG)</label>
+        <input type="file" id="paginas" name="paginas" accept=".png,.jpg,.jpeg" multiple required>
+
+        <div class="preview-container" id="previewContainer"></div>
+
+        <button type="submit">Publicar Capítulo</button>
+        <a href="#" class="back-link">← Voltar</a>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Toon Archive - Todos os direitos reservados.
+  </footer>
+
+  <script>
+    // =========================
+    // PREVIEW DAS IMAGENS
+    // =========================
+    const inputPaginas = document.getElementById("paginas");
+    const previewContainer = document.getElementById("previewContainer");
+    let selectedImages = [];
+
+    inputPaginas.addEventListener("change", function() {
+      const newFiles = Array.from(this.files);
+
+      newFiles.forEach(file => {
+        const id = Math.random().toString(36).substring(2, 10);
+        selectedImages.push({ id, file });
+
+        const box = document.createElement("div");
+        box.className = "image-box";
+        box.dataset.id = id;
+
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "×";
+        removeBtn.className = "remove-individual";
+        removeBtn.onclick = () => {
+  selectedImages = selectedImages.filter(f => f.id !== id);
+  box.remove();
+
+ 
+  if (selectedImages.length === 0) {
+    inputPaginas.value = ""; 
+  }
+};
+
+        box.appendChild(img);
+        box.appendChild(removeBtn);
+        previewContainer.appendChild(box);
+      });
+    });
+
+    // =========================
+    // MENSAGEM INLINE (fixa)
+    // =========================
+    function showMessage(text, type = 'ok', extra = '') {
+      const box = document.getElementById('msgBox');
+      box.className = 'msg show ' + (type === 'ok' ? 'msg--ok' : type === 'warn' ? 'msg--warn' : 'msg--err');
+      box.innerHTML = text + (extra ? `<small>${extra}</small>` : '');
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+ // =========================
+// CORRIGE LINKS (logo e botão voltar)
+// =========================
+window.addEventListener("load", () => {
+  const url = new URL(window.location.href);
+  const mangaId = url.searchParams.get("mangaId");
+
+  const backLink = document.querySelector(".back-link");
+  const logoLink = document.querySelector("header a");
+
+  if (mangaId && mangaId.trim() !== "" && mangaId !== "null") {
+    const destino = `telamanga.html?id=${mangaId}`;
+    if (backLink) backLink.setAttribute("href", destino);
+    if (logoLink) logoLink.setAttribute("href", destino);
+    console.log(`✅ Botão Voltar ajustado para: ${destino}`);
+  } else {
+    console.warn("⚠️ Nenhum mangaId válido encontrado na URL.");
+    if (backLink) backLink.setAttribute("href", "Html-toonarchive.html");
+    if (logoLink) logoLink.setAttribute("href", "Html-toonarchive.html");
+  }
+});
+
+
+
+    // =========================
+    // ENVIO AO BACKEND (sem redirecionar)
+    // =========================
+    document.getElementById("capituloForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const btn = this.querySelector('button[type="submit"]');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Publicando...';
+
+      const params = new URLSearchParams(window.location.search);
+      const mangaId = params.get("mangaId");
+
+      if (!mangaId) {
+        showMessage('❌ ID do mangá não encontrado na URL!', 'err');
+        btn.disabled = false;
+        btn.innerHTML = original;
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("mangaId", mangaId);
+      formData.append("tituloCapitulo", document.getElementById("tituloCapitulo").value);
+      formData.append("numero", document.getElementById("numero").value);
+
+      selectedImages.forEach(imgObj => formData.append("paginas", imgObj.file));
+
+      try {
+        const resposta = await fetch("http://localhost:8080/capitulos", {
+          method: "POST",
+          body: formData
+        });
+
+        if (resposta.status === 409) {
+          showMessage('⚠️ Já existe um capítulo com esse número neste mangá.', 'warn',
+                      'Você pode usar números como 5.5 para capítulos extras.');
+        } else if (!resposta.ok) {
+          const msg = await resposta.text().catch(()=> '');
+          showMessage('❌ Erro ao publicar capítulo.', 'err', msg || 'Tente novamente mais tarde.');
+        } else {
+          showMessage('✅ Capítulo publicado com sucesso!', 'ok',
+                      'Você pode publicar outro capítulo agora ou voltar para o mangá.');
+        }
+      } catch (erro) {
+        console.error(erro);
+        showMessage('❌ Erro de conexão com o servidor.', 'err');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    });
+  </script>
+</body>
+</html>
