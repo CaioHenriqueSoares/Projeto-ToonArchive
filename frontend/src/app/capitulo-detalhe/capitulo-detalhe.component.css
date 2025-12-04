@@ -1,0 +1,349 @@
+/* capitulo.component.css */
+
+body {
+  background-color: #0A1014;
+  color: #eee;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  user-select: none;
+}
+
+main {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+/* TÍTULO E INFORMAÇÕES */
+.chapter-info {
+  width: 100%;
+  max-width: 800px;
+}
+
+.chapter-header {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.chapter-number {
+  color: #9d4edd;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.chapter-title {
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* NAVEGAÇÃO */
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+  position: relative;
+  min-height: auto;
+}
+
+.nav-btn {
+  background-color: #3e2759;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  font-weight: bold;
+  flex-shrink: 0;
+
+  position: relative;
+  z-index: 20;
+}
+
+.nav-btn.disabled {
+  background-color: #2a2c35;
+  color: #777;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.nav-btn[disabled] {
+  background-color: #2a2c35;
+  color: #777;
+  cursor: not-allowed;
+  pointer-events: none; /* reforça que não é clicável */
+  opacity: 0.60;
+}
+
+/* LEITOR DE CAPÍTULO */
+#leitor-capitulo {
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.pagina {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* COMENTÁRIOS */
+#comentarios-container {
+  max-width: 800px;
+  width: 100%;
+  padding: 20px;
+  background-color: #1B1C22;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  margin-top: 30px;
+}
+
+#comentarios-container h2 {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.comentario-form {
+  margin-bottom: 25px;
+}
+
+.comentario-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #0A1014;
+  color: #eee;
+  resize: vertical;
+  min-height: 80px;
+  margin-bottom: 10px;
+}
+
+.comentario-form button {
+  background-color: #9d4edd;
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.comentario-form button:hover:not([disabled]) {
+  background-color: #b266ff;
+}
+
+.comentario-form button:disabled {
+  background-color: #333;
+  cursor: not-allowed;
+}
+
+.comentario-item {
+  background-color: #2a2c35;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  text-align: left;
+  position: relative;
+}
+
+.comentario-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.comentario-autor {
+  color: #9d4edd;
+  font-weight: bold;
+}
+
+.comentario-data {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.comentario-texto {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.comentario-actions {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.comentario-actions button {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.comentario-actions button:hover {
+  color: #fff;
+}
+
+/* Edição e Exclusão */
+.comentario-edicao textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #0A1014;
+  color: #eee;
+  resize: vertical;
+  min-height: 80px;
+  margin-bottom: 10px;
+}
+
+.edicao-botoes {
+  display: flex;
+  gap: 10px;
+}
+
+.comentario-salvar-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.comentario-cancelar-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.confirmacao-exclusao {
+  background-color: #f4433620;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.confirmacao-exclusao p {
+  margin-top: 0;
+  color: #f44336;
+  font-weight: bold;
+}
+
+.login-msg,
+.empty-text {
+  color: #aaa;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+/* ==============================================
+   🔹 ESTILOS PARA O LEITOR DE PÁGINAS (NOVO)
+   ============================================== */
+
+/* Container que engloba o leitor de páginas e os controles */
+.page-reader-container {
+  width: 100%;
+  max-width: 800px;
+  /* Limita o leitor a uma largura máxima para leitura confortável */
+  margin: 0 auto 30px;
+  /* Centraliza horizontalmente e adiciona margem inferior */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+  /* Desativa a seleção de texto para uma experiência de leitura */
+}
+
+/* Wrapper da imagem para centralizar e dar padding */
+.pagina-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* A imagem em si */
+.pagina-imagem {
+  max-width: 100%;
+  /* Garante que nunca ultrapasse o container (800px) */
+  height: auto;
+  /* Mantém a proporção */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  /* Sombra para destaque */
+  border-radius: 5px;
+}
+
+/* Controles de Navegação da Página */
+.page-nav-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  /* Limita a largura dos botões de navegação */
+  margin-bottom: 15px;
+}
+
+.page-nav-btn {
+  background-color: #3e2759;
+  /* Cor de fundo */
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: bold;
+}
+
+.page-nav-btn:hover {
+  background-color: #5d3989;
+}
+
+.page-nav-btn:active {
+  background-color: #7b4ea9;
+}
+
+.page-counter {
+  font-weight: bold;
+  color: #ccc;
+  font-size: 1.1em;
+}
+
+/* Opções: Se você quiser que o botão de navegação do capítulo principal fique mais visível */
+.chapter-nav .nav-btn {
+  background-color: #5d3989;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.chapter-nav .nav-btn:hover:not(.disabled) {
+  background-color: #7b4ea9;
+}

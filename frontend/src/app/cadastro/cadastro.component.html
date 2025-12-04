@@ -1,0 +1,30 @@
+<div class="page">
+  <div class="card">
+    <div class="logo"><span class="word toon">TOON</span><span class="word archive">ARCHIVE</span></div>
+    <div class="subtitle">Crie sua conta para começar a publicar e ler</div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label for="apelido">Apelido</label>
+      <input id="apelido" type="text" formControlName="apelido" placeholder="Ex: joaozinho" />
+
+      <label for="email">E-mail</label>
+      <input id="email" type="email" formControlName="email" placeholder="seuemail@exemplo.com" />
+
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" formControlName="senha" placeholder="********" />
+
+      <label for="confirm">Confirmar senha</label>
+      <input id="confirm" type="password" formControlName="confirm" placeholder="********" />
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Cadastrando...' : 'Cadastrar' }}
+      </button>
+
+      <div id="mensagem" [style.color]="messageColor" class="mensagem">
+    {{ message }}
+  </div>
+
+  <div class="links">
+    Já tem uma conta? <a routerLink="/login">Entrar</a>
+  </div>
+</form>

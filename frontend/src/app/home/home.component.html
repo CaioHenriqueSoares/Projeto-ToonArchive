@@ -1,0 +1,102 @@
+<div class = "page">
+  <header>
+    <div class="header-esquerda">
+      <button class="menu-btn" (click)="toggleMenu()">☰</button>
+
+      <div class="busca-container">
+        <input type="text" id="campoBusca" placeholder="Buscar mangá..." [(ngModel)]="termo" (input)="onBuscar()" />
+        <div id="resultadosBusca" [class.mostrar]="resultadosVisiveis">
+          <div *ngFor="let r of resultados" (click)="abrirManga(r.id)">
+            <strong>{{ r.nome }}</strong><br />
+            <small>{{ r.autor || 'Autor desconhecido' }}</small>
+          </div>
+          <div *ngIf="resultados.length === 0 && resultadosVisiveis">Nenhum mangá encontrado.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-centro">
+      <img src="assets/logo.png" alt="Toon Archive" class="logo" />
+    </div>
+
+    <div class="header-direita" style="position: relative;">
+      <button id="usuarioBtn" class="usuario-btn" (click)="onUsuarioClick($event)">👤</button>
+      <div id="menuUsuario" class="menu-usuario" [class.ativo]="menuUsuarioAtivo" (click)="$event.stopPropagation()">
+        <p id="usuarioNome">{{ apelido || '' }}</p>
+        <button id="logoutBtn" (click)="abrirLogout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <nav id="menu-lateral" class="menu-lateral" [class.ativo]="menuAtivo">
+    <ul>
+      <li><button (click)="ir('/publicar-obra')">📖 Publicação</button></li>
+      <li><button>🌐 Idioma</button></li>
+      <li><button (click)="ir('/comunidade')">💬 Comunidade</button></li>
+    </ul>
+  </nav>
+  <div id="overlay" [class.ativo]="overlayAtivo" (click)="fecharMenu()"></div>
+
+  <div class="banner-carousel">
+    <div class="banner-slides" [style.transform]="'translateX(-' + slideAtual * 100 + '%)'">
+      <div class="banner-slide"><img src="assets/BannerGachakuta.png" /></div>
+      <div class="banner-slide"><img src="assets/BannerConstantine.png" /></div>
+      <div class="banner-slide"><img src="assets/BannerBleach.png" /></div>
+    </div>
+    <div class="banner-indicators">
+      <span class="dot" [class.active]="slideAtual===0" (click)="goToSlide(0)"></span>
+      <span class="dot" [class.active]="slideAtual===1" (click)="goToSlide(1)"></span>
+      <span class="dot" [class.active]="slideAtual===2" (click)="goToSlide(2)"></span>
+    </div>
+  </div>
+
+  <section class="catalogo">
+    <h2>📢 Recém-lançados:</h2>
+    <div class="recentes-container">
+      <button class="seta seta-esquerda" (click)="rolar('recentes', -1)">&#10094;</button>
+      <div id="recentes" class="mangas">
+        <div class="manga-card" *ngFor="let m of recentes" (click)="abrirManga(m.id)">
+          <img [src]="m.capa ? API_BASE + m.capa : 'assets/placeholder.png'"/>
+          <p>{{ m.nome || 'Sem título' }}</p>
+        </div>
+        <p *ngIf="erroRecentes" style="color:#fff">Erro ao carregar obras.</p>
+      </div>
+      <button class="seta seta-direita" (click)="rolar('recentes', 1)">&#10095;</button>
+    </div>
+
+    <h2>🔥 Destaques:</h2>
+    <div class="destaques-container">
+      <button class="seta seta-esquerda" (click)="rolar('destaques', -1)">&#10094;</button>
+      <div id="destaques" class="mangas">
+        <div class="manga-card" *ngFor="let d of destaques">
+          <img [src]="d.img" /><p>{{ d.titulo }}</p>
+        </div>
+      </div>
+      <button class="seta seta-direita" (click)="rolar('destaques', 1)">&#10095;</button>
+    </div>
+
+    <h2>⭐ Favoritos:</h2>
+    <div class="favoritos-container">
+      <button class="seta seta-esquerda" (click)="rolar('favoritos', -1)">&#10094;</button>
+      <div id="favoritos" class="mangas">
+        <div class="manga-card" *ngFor="let f of favoritos">
+          <img [src]="f.img" /><p>{{ f.titulo }}</p>
+        </div>
+      </div>
+      <button class="seta seta-direita" (click)="rolar('favoritos', 1)">&#10095;</button>
+    </div>
+  </section>
+
+  <footer>© 2025 Toon Archive - Todos os direitos reservados.</footer>
+
+  <!-- Modal de confirmação de logout -->
+  <div id="logoutModal" class="logout-modal" [class.ativo]="logoutAtivo">
+    <div class="logout-content">
+      <p>Deseja sair?</p>
+      <div class="logout-buttons">
+        <button id="confirmLogout" class="btn-ok" (click)="confirmarLogout()">Sim</button>
+        <button id="cancelLogout" class="btn-cancel" (click)="cancelarLogout()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>  

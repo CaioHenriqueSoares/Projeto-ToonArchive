@@ -1,0 +1,96 @@
+<header class="ta-header">
+  <a routerLink="/home">
+    <img src="assets/logo.png" alt="Toon Archive" class="ta-logo">
+  </a>
+</header>
+
+<main> <div class="form-container"> <h2>Publicar Capítulo</h2>
+
+    <div *ngIf="mensagem" class="msg show" [ngClass]="'msg--' + mensagemTipo">
+      {{ mensagem }}
+      <small *ngIf="mensagemTipo === 'warn'">Você pode usar números como 5.5 para capítulos extras.</small>
+    </div>
+
+    <form (ngSubmit)="publicarCapitulo()" #capForm="ngForm"> <label for="tituloCapitulo">Título do Capítulo</label>
+      <input
+        id="tituloCapitulo"
+        name="tituloCapitulo"
+        type="text"
+        placeholder="Ex: A Verdade"
+        [(ngModel)]="tituloCapitulo"
+        required
+      />
+
+      <label for="numero">Número do Capítulo</label>
+      <input
+        id="numero"
+        name="numero"
+        type="number"
+        step="0.1"
+        placeholder="Ex: 1 ou 5.5"
+        [(ngModel)]="numero"
+        required
+      />
+
+      <label for="paginas">Enviar Páginas (PNG)</label>
+      <input
+        id="paginas"
+        name="paginas"
+        type="file"
+        accept=".png,.jpg,.jpeg"
+        multiple
+        (change)="onSelecionarPaginas($event)"
+      />
+
+      <div class="preview-container">
+        <div
+          class="image-box" *ngFor="let img of imagens; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+        >
+          <img [src]="img.preview" (click)="abrirPreview(img.preview)" />
+          <button type="button" class="remove-individual" (click)="removerImagem(i)"></button> </div>
+      </div>
+
+      <button type="submit">Publicar Capítulo</button> 
+      <button class="btn-voltar" (click)="voltarManga()">← Voltar</button>
+    </form>
+  </div>
+
+
+<div class="modal-backdrop" *ngIf="imagemSelecionada" (click)="fecharPreview()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="fecharPreview()">×</button>
+
+    <div
+      class="zoom-container"
+      (wheel)="onWheel($event)"
+      (mousedown)="onMouseDown($event)"
+      (mouseup)="onMouseUp()"
+      (mouseleave)="onMouseUp()"
+      (mousemove)="onMouseMove($event)"
+    >
+      <img
+        [src]="imagemSelecionada"
+        alt="Pré-visualização"  
+        [style.transform]="
+          'scale(' + zoomLevel + ') translate(' + offsetX + 'px,' + offsetY + 'px)'
+        "
+      />
+    </div>
+
+    <div class="zoom-controls">
+      <button (click)="zoomIn()">+</button>
+      <button (click)="zoomOut()">−</button>
+      <button (click)="resetZoom()">⟳</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="footer">
+  © 2025 Toon Archive - Todos os direitos reservados.
+</footer>

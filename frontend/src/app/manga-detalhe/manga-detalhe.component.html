@@ -1,0 +1,128 @@
+<header class="ta-header">
+  <a routerLink="/home">
+    <img src="assets/logo.png" alt="Toon Archive" class="ta-logo">
+  </a>
+</header>
+
+<main class="ta-main">
+
+  <!-- CARD DO MANGÁ -->
+  <ng-container *ngIf="manga; else carregandoManga">
+    <section class="manga-card">
+      <img class="manga-cover" [src]="API + manga.capa" [alt]="'Capa de ' + manga.nome">
+
+      <div class="manga-info">
+        <h2 class="manga-title">{{ manga.nome }}</h2>
+
+        <p class="manga-meta"><strong>Autor:</strong> {{ manga.autor }} <span *ngIf="isAuthor" class="tag-autor">(Você)</span></p>
+        <p class="manga-meta"><strong>Editora:</strong> {{ manga.editora || '-' }}</p>
+        <p class="manga-meta"><strong>Ano:</strong> {{ manga.ano || '-' }}</p>
+
+        <p class="manga-description">
+          {{ manga.descricao }}
+        </p>
+
+        <button class="manage-btn" *ngIf="isAdmin || isAuthor" (click)="irParaGerenciarCapitulos()">
+          ⚙ Gerenciar Capítulos
+        </button>
+      </div>
+    </section>
+  </ng-container>
+
+  <ng-template #carregandoManga>
+    <h2 class="loading-title">Carregando mangá...</h2>
+  </ng-template>
+
+  <!-- CARD DE CAPÍTULOS -->
+  <section class="chapter-card">
+    <h3>Capítulos:</h3>
+
+    <div *ngIf="capitulos?.length; else semCapitulos">
+      <div class="chapter-row" *ngFor="let cap of capitulos">
+        <span class="chapter-title">
+          Capítulo {{ cap.numero }} - {{ cap.tituloCapitulo }}
+        </span>
+        <button class="read-btn" [routerLink]="['/capitulo-detalhe']" [queryParams]="{ id: cap.id }">
+          📁 Ler
+        </button>
+      </div>
+    </div>
+
+    <ng-template #semCapitulos>
+      <p class="empty-text">Não há capítulos cadastrados ainda.</p>
+    </ng-template>
+  </section>
+
+  <!-- CARD DE COMENTÁRIOS -->
+  <section class="comments-card">
+    <h3>Comentários</h3>
+
+    <!-- ITEM DO COMENTÁRIO -->
+    <div class="comentario-item" *ngFor="let c of comentarios">
+      <div class="comentario-header">
+        <span class="autor">{{ c.autor }}</span>
+
+        <!-- BOTÕES DE EDITAR / EXCLUIR -->
+        <div class="comentario-acoes" *ngIf="podeGerirComentario(c)">
+          <!-- iniciar edição -->
+          <button type="button" class="acao editar" *ngIf="!c.emEdicao && !c.confirmandoExclusao"
+            (click)="iniciarEdicao(c)">✏️</button>
+
+          <!-- iniciar confirmação de exclusão -->
+          <button type="button" class="acao excluir" *ngIf="!c.emEdicao && !c.confirmandoExclusao"
+            (click)="pedirConfirmacaoExclusao(c)">🗑️</button>
+        </div>
+      </div>
+
+      <!-- MODO NORMAL (mostrar texto) -->
+      <div class="comentario-texto" *ngIf="!c.emEdicao && !c.confirmandoExclusao">
+        {{ c.texto }}
+      </div>
+
+      <!-- MODO EDIÇÃO -->
+      <div *ngIf="c.emEdicao" style="margin-top:8px;">
+        <textarea class="comentario-editar-area" [(ngModel)]="c.textoEditado" name="textoEditado_{{c.id}}">
+    </textarea>
+
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button type="button" class="comentario-salvar-btn" (click)="salvarEdicao(c)" [disabled]="c.saving">
+            {{ c.saving ? 'Salvando…' : '💾 Salvar' }}
+          </button>
+
+          <button type="button" class="comentario-cancelar-btn" (click)="cancelarEdicao(c)" [disabled]="c.saving">
+            ❌ Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- CONFIRMAÇÃO DE EXCLUSÃO -->
+      <div *ngIf="c.confirmandoExclusao" style="margin-top:8px; text-align:center;">
+        <button type="button" class="comentario-salvar-btn" (click)="confirmarExclusao(c)">🗑️ Excluir</button>
+        <button type="button" class="comentario-cancelar-btn" (click)="cancelarExclusao(c)">❌ Cancelar</button>
+      </div>
+
+      <!-- DATA -->
+      <span class="comentario-data">
+        {{ c.dataHora | date:'short' }}
+      </span>
+    </div>
+
+    <ng-template #carregandoComentarios>
+      <p class="empty-text">Carregando comentários...</p>
+    </ng-template>
+
+    <!-- FORM -->
+    <form (ngSubmit)="enviarComentario()" class="comment-form">
+      <textarea [(ngModel)]="comentarioTexto" name="comentarioTexto" placeholder="Escreva um comentário..." required>
+    </textarea>
+      <button type="submit" class="comment-submit">Enviar</button>
+    </form>
+  </section>
+
+
+
+</main>
+
+<footer class="ta-footer">
+  © 2025 Toon Archive - Todos os direitos reservados.
+</footer>

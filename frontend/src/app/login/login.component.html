@@ -1,0 +1,39 @@
+<div class="page">
+  <div class="card">
+    <div class="logo">
+      <span class="toon">TOON</span> <span class="archive">ARCHIVE</span>
+    </div>
+    <div class="subtitle">Entre na sua conta para continuar</div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label for="apelido">E-mail ou Apelido</label>
+      <input
+        id="apelido"
+        type="text"
+        formControlName="apelido"
+        placeholder="joaozinho@exemplo.com ou joaozinho"
+      />
+      <small class="error" *ngIf="submitted && form.controls['apelido'].invalid">
+        Informe seu e-mail ou apelido.
+      </small>
+
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" formControlName="senha" placeholder="********" />
+      <small class="error" *ngIf="submitted && form.controls['senha'].invalid">
+        Informe sua senha.
+      </small>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Entrando...' : 'Entrar' }}
+      </button>
+
+      <div id="mensagem" class="mensagem" [style.color]="messageColor">
+        {{ message }}
+      </div>
+
+      <div class="links">
+        Não tem conta? <a routerLink="/cadastro">Cadastre-se</a>
+      </div>
+    </form>
+  </div>
+</div>
