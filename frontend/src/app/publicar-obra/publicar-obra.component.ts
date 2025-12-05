@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-publicar-obra',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './publicar-obra.component.html',
   styleUrls: ['./publicar-obra.component.css']
 })
@@ -27,6 +28,16 @@ export class PublicarObraComponent {
     ano: '',
     descricao: ''
   };
+
+  ngOnInit(): void {
+    const apelido = localStorage.getItem("apelido");
+
+    if (apelido) {
+      this.manga.autor = apelido;
+    } else {
+      console.warn("⚠ Nenhum apelido encontrado no localStorage!");
+    }
+  }
 
   onCapaSelecionada(event: any): void {
   const file: File = event.target.files[0];

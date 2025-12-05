@@ -12,8 +12,8 @@
       <label for="nome">Nome do Mangá</label>
       <input type="text" id="nome" [(ngModel)]="manga.nome" name="nome" placeholder="Ex: SPY×FAMILY" required>
 
-      <label for="autor">Autor</label>
-      <input type="text" id="autor" [(ngModel)]="manga.autor" name="autor" placeholder="Ex: Endou Tatsuya" required>
+      <label>Autor</label>
+      <div class="autor">{{ manga.autor || 'Você precisa fazer login' }}</div>
 
       <label for="editora">Editora</label>
       <input type="text" id="editora" [(ngModel)]="manga.editora" name="editora" placeholder="Ex: Shueisha" required>
@@ -29,7 +29,7 @@
 
       <button type="submit">Publicar Mangá</button>
 
-      <a href="/home" class="back-link">← Voltar para página inicial</a>
+      <a routerLink="/home" class="back-link">← Voltar para página inicial</a>
     </form>
   </div>
 </main>
