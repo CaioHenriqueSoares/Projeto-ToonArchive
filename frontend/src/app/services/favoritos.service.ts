@@ -1,42 +1,46 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class FavoritosService {
+  private API = "http://localhost:8080/favoritos";
 
-  private KEY = "favoritos";
+  constructor(private http: HttpClient) {}
 
-  private getLista(): number[] {
-    return JSON.parse(localStorage.getItem(this.KEY) || '[]');
+  private getUserId(): number | null {
+    const raw = localStorage.getItem('usuarioId') ?? localStorage.getItem('userId');
+    if (!raw) return null;
+    const n = Number(raw);
+    if (!n || isNaN(n) || n <= 0) return null;
+    return n;
   }
 
-  private salvar(lista: number[]) {
-    localStorage.setItem(this.KEY, JSON.stringify(lista));
+  private headersWithUserId(): { headers?: HttpHeaders } {
+    const uid = this.getUserId();
+    if (!uid) return {};
+    return { headers: new HttpHeaders({ 'X-User-Id': String(uid) }) };
   }
 
-  // Verifica se um mangá é favorito
-  isFavorito(id: number): boolean {
-    return this.getLista().includes(id);
+  checkFavorito(mangaId: number): Observable<any> {
+    const uid = this.getUserId();
+    if (!uid) return throwError(() => new Error('Usuário não autenticado (userId ausente)'));
+    return this.http.get<any>(`${this.API}/check/${mangaId}`, this.headersWithUserId());
   }
 
-  // Adiciona ou remove
-  toggleFavorito(id: number): boolean {
-    const lista = this.getLista();
-
-    if (lista.includes(id)) {
-      const nova = lista.filter(x => x !== id);
-      this.salvar(nova);
-      return false; // removido
-    } else {
-      lista.push(id);
-      this.salvar(lista);
-      return true; // adicionado
-    }
+  toggleFavorito(mangaId: number): Observable<any> {
+    const uid = this.getUserId();
+    if (!uid) return throwError(() => new Error('Usuário não autenticado (userId ausente)'));
+    return this.http.post<any>(`${this.API}/toggle/${mangaId}`, {}, this.headersWithUserId());
   }
 
-  // Lista todos os IDs dos favoritos
-  getFavoritos(): number[] {
-    return this.getLista();
+  listarFavoritosUsuario(): Observable<any> {
+    const uid = this.getUserId();
+    if (!uid) return throwError(() => new Error('Usuário não autenticado (userId ausente)'));
+    return this.http.get<any>(`${this.API}/usuario`, this.headersWithUserId());
+  }
+
+  topFavoritos(limit = 3): Observable<any> {
+    return this.http.get<any>(`${this.API}/top?limit=${limit}`);
   }
 }

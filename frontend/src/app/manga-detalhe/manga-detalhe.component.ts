@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FavoritosService } from '../services/favoritos.service';
 
 @Component({
   selector: 'app-manga-detalhe',
   standalone: true,
-  imports: [RouterModule, FormsModule, CommonModule],
+  imports: [RouterModule, FormsModule, CommonModule, HttpClientModule],
   templateUrl: './manga-detalhe.component.html',
   styleUrls: ['./manga-detalhe.component.css']
 })
@@ -25,17 +26,21 @@ export class MangaDetalheComponent implements OnInit {
   isAdmin: boolean = false;
   isAuthor: boolean = false;
   usuarioAtual: string = '';
+  isFav = false;
+  favoritoLoading: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private favService: FavoritosService
   ) { }
 
   ngOnInit(): void {
     // ler usuario/admin antes de carregar comentários
     this.usuarioAtual = (localStorage.getItem('apelido') || '').trim();
     this.isAdmin = localStorage.getItem('tipo') === 'admin';
+    
 
     this.route.queryParamMap.subscribe(params => {
     // Declara o ID como string | null
@@ -47,6 +52,7 @@ export class MangaDetalheComponent implements OnInit {
       this.carregarManga(id);
       this.carregarCapitulos(id); 
       this.carregarComentarios(id); 
+      this.carregarStatusFavorito();
     } else {
       // Opcional: Redirecionar para uma página de erro ou home
       console.error("ID do mangá não encontrado na URL.");
@@ -57,7 +63,6 @@ export class MangaDetalheComponent implements OnInit {
 
   // --- carregamento de dados ---
   carregarManga(id: string) {
-  // Opcional, mas limpa o estado anterior
   this.manga = null; 
   this.http.get<any>(`${this.API}/mangas/${id}`)
     .subscribe({
@@ -66,12 +71,10 @@ export class MangaDetalheComponent implements OnInit {
         this.capitulos = m.capitulos || []; 
         this.isAuthor = this.manga.autor === this.usuarioAtual;
         this.atualizarPermissoesPorManga();
+        this.carregarStatusFavorito();
       },
       error: (err) => {
         console.error('Erro ao carregar mangá:', err);
-        
-        // CORREÇÃO CRÍTICA: Define 'manga' para um objeto de erro.
-        // Isso faz com que o *ngIf="manga" seja TRUE, saindo do carregamento.
         this.manga = {
           nome: 'Falha ao Carregar',
           descricao: 'Não foi possível carregar os detalhes do mangá. Tente novamente mais tarde.',
@@ -83,45 +86,24 @@ export class MangaDetalheComponent implements OnInit {
     });
 }
 
+private normalizarAutor(m: any): string {
+    if (!m) return '';
+    if (typeof m.autor === 'string') return m.autor;
+    if (typeof m.autor === 'object' && m.autor !== null) {
+      return (m.autor.apelido || m.autor.username || m.autor.nome || '').toString();
+    }
+    return '';
+  }
+
 
   private atualizarPermissoesPorManga(): void {
-    console.log('[DEBUG] atualizarPermissoesPorManga - usuarioAtual (localStorage.apelido):', this.usuarioAtual);
-    console.log('[DEBUG] manga recebido:', this.manga);
-
-    if (!this.manga) {
-      this.isAuthor = false;
-      return;
-    }
-
-    // tenta extrair apelido/username/identificador do autor em várias formas
-    let autorDoManga = '';
-
-    // caso 1: autor é string (ex: "joao")
-    if (typeof this.manga.autor === 'string' && this.manga.autor.trim() !== '') {
-      autorDoManga = this.manga.autor;
-    }
-
-    // caso 2: autor é objeto com apelido/username/nome
-    else if (typeof this.manga.autor === 'object' && this.manga.autor !== null) {
-      autorDoManga = (
-        this.manga.autor.apelido ||
-        this.manga.autor.username ||
-        this.manga.autor.nome ||
-        ''
-      ).toString();
-    }
-
-    // caso 3: autor pode ser um id numérico (ex: 5) -> tenta comparar por id se você tiver userId local
-    // daqui em diante, normalizamos strings
-    const autorNormalized = (autorDoManga || '').toString().trim();
+    // mantém sua lógica, mas usa normalizarAutor
+    const autorNormalized = (this.normalizarAutor(this.manga) || '').toString().trim();
     const usuarioNormalized = (this.usuarioAtual || '').toString().trim();
-
-    // regra principal: author se apelido bater com usuarioAtual (case-insensitive)
     if (autorNormalized && usuarioNormalized) {
       this.isAuthor = usuarioNormalized.toLowerCase() === autorNormalized.toLowerCase();
     } else {
-      // fallback: se backend retorna autor como objeto com id e você tem userId no localStorage
-      const autorId = this.manga.autor?.id ?? this.manga.autor?.userId ?? null;
+      const autorId = this.manga?.autor?.id ?? this.manga?.autor?.userId ?? null;
       const userIdLocal = localStorage.getItem('userId') || localStorage.getItem('usuarioId') || null;
       if (autorId && userIdLocal) {
         this.isAuthor = String(autorId) === String(userIdLocal);
@@ -130,6 +112,55 @@ export class MangaDetalheComponent implements OnInit {
       }
     }
   }
+
+  private getUserIdOrWarn(): number | null {
+  const raw = localStorage.getItem('usuarioId') ?? localStorage.getItem('userId');
+  const n = Number(raw);
+  if (!raw || !n || isNaN(n) || n <= 0) {
+    alert('Você precisa estar logado (userId ausente). Para testes, defina localStorage.setItem(\"usuarioId\",\"<seu-id>\") no console.');
+    return null;
+  }
+  return n;
+}
+
+   private carregarStatusFavorito(): void {
+    const id = this.manga?.id ?? this.route.snapshot.queryParamMap.get('id');
+    if (!id) return;
+    if (!this.getUserIdOrWarn()) return;
+
+    // Usamos o service (que faz HTTP) — subscribe deve existir
+    this.favService.checkFavorito(id).subscribe({
+      next: (res: any) => {
+        this.isFav = !!res?.favorito;
+      },
+      error: (err: any) => {
+        console.warn('Erro ao checar favorito', err);
+        this.isFav = false;
+      }
+    });
+  }
+
+onToggleFavorito(): void {
+  const id = Number(this.manga?.id ?? this.route.snapshot.queryParamMap.get('id'));
+  if (!id) return;
+  if (!this.getUserIdOrWarn()) return;
+
+  const prev = this.isFav;
+  this.isFav = !prev;
+  this.favoritoLoading = true;
+
+  this.favService.toggleFavorito(id).subscribe({
+    next: (res: any) => {
+      this.isFav = !!res?.favorito;
+      this.favoritoLoading = false;
+    },
+    error: (err: any) => {
+      console.error('Erro ao alternar favorito', err);
+      this.isFav = prev;
+      this.favoritoLoading = false;
+    }
+  });
+}
 
 
 

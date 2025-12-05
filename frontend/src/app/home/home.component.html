@@ -1,4 +1,4 @@
-<div class = "page">
+<div class="page">
   <header>
     <div class="header-esquerda">
       <button class="menu-btn" (click)="toggleMenu()">☰</button>
@@ -37,16 +37,21 @@
   </nav>
   <div id="overlay" [class.ativo]="overlayAtivo" (click)="fecharMenu()"></div>
 
-  <div class="banner-carousel">
+  <div class="banner-carousel" *ngIf="carrossel.length > 0">
     <div class="banner-slides" [style.transform]="'translateX(-' + slideAtual * 100 + '%)'">
-      <div class="banner-slide"><img src="assets/BannerGachakuta.png" /></div>
-      <div class="banner-slide"><img src="assets/BannerConstantine.png" /></div>
-      <div class="banner-slide"><img src="assets/BannerBleach.png" /></div>
+
+      <!-- UM SLIDE PARA CADA OBRA -->
+      <div class="banner-slide" *ngFor="let m of carrossel" (click)="abrirManga(m.id)">
+        <img [src]="m.capa ? API_BASE + m.capa : 'assets/placeholder.png'" />
+      </div>
+
     </div>
+
+    <!-- INDICADORES -->
     <div class="banner-indicators">
-      <span class="dot" [class.active]="slideAtual===0" (click)="goToSlide(0)"></span>
-      <span class="dot" [class.active]="slideAtual===1" (click)="goToSlide(1)"></span>
-      <span class="dot" [class.active]="slideAtual===2" (click)="goToSlide(2)"></span>
+      <span class="dot" *ngFor="let m of carrossel; let i = index" [class.active]="slideAtual === i"
+        (click)="goToSlide(i)">
+      </span>
     </div>
   </div>
 
@@ -56,7 +61,7 @@
       <button class="seta seta-esquerda" (click)="rolar('recentes', -1)">&#10094;</button>
       <div id="recentes" class="mangas">
         <div class="manga-card" *ngFor="let m of recentes" (click)="abrirManga(m.id)">
-          <img [src]="m.capa ? API_BASE + m.capa : 'assets/placeholder.png'"/>
+          <img [src]="m.capa ? API_BASE + m.capa : 'assets/placeholder.png'" />
           <p>{{ m.nome || 'Sem título' }}</p>
         </div>
         <p *ngIf="erroRecentes" style="color:#fff">Erro ao carregar obras.</p>
@@ -67,22 +72,37 @@
     <h2>🔥 Destaques:</h2>
     <div class="destaques-container">
       <button class="seta seta-esquerda" (click)="rolar('destaques', -1)">&#10094;</button>
+
       <div id="destaques" class="mangas">
-        <div class="manga-card" *ngFor="let d of destaques">
-          <img [src]="d.img" /><p>{{ d.titulo }}</p>
+        <div class="manga-card" *ngFor="let d of destaques" (click)="abrirManga(d.id)"
+          title="{{ d.nome || 'Sem título' }}">
+          <img [src]="d.capa ? (API_BASE + d.capa) : 'assets/placeholder.png'" alt="{{ d.nome || 'Capa' }}" />
+          <p>{{ d.nome || 'Sem título' }}</p>
         </div>
+
+        <p *ngIf="erroDestaques" style="color:#fff">Erro ao carregar destaques.</p>
+        <p *ngIf="!erroDestaques && destaques?.length === 0" style="color:#fff">Ainda não há destaques.</p>
       </div>
+
       <button class="seta seta-direita" (click)="rolar('destaques', 1)">&#10095;</button>
     </div>
 
     <h2>⭐ Favoritos:</h2>
     <div class="favoritos-container">
       <button class="seta seta-esquerda" (click)="rolar('favoritos', -1)">&#10094;</button>
+
       <div id="favoritos" class="mangas">
-        <div class="manga-card" *ngFor="let f of favoritos">
-          <img [src]="f.img" /><p>{{ f.titulo }}</p>
+        <div class="manga-card" *ngFor="let f of favoritos" (click)="abrirManga(f.id)"
+          title="{{ f.nome || 'Sem título' }}">
+          <img [src]="f.capa ? (API_BASE + f.capa) : 'assets/placeholder.png'" alt="{{ f.nome || 'Capa' }}" />
+          <p>{{ f.nome || 'Sem título' }}</p>
         </div>
+
+        <p *ngIf="erroFavoritos" style="color:#fff">Faça login para ver seus favoritos ou não há favoritos ainda.</p>
+        <p *ngIf="!erroFavoritos && favoritos?.length === 0" style="color:#fff">Você ainda não favoritou nenhuma obra.
+        </p>
       </div>
+
       <button class="seta seta-direita" (click)="rolar('favoritos', 1)">&#10095;</button>
     </div>
   </section>
@@ -99,4 +119,4 @@
       </div>
     </div>
   </div>
-</div>  
+</div>

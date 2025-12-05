@@ -9,6 +9,10 @@ interface LoginResponse {
   status: string;
   mensagem?: string;
   apelido?: string;
+  id?: number;           // esperamos o id do usuário aqui
+  tipo?: string;         // opcional: tipo/role
+  // caso o backend retorne um objeto usuário: usuario?: { id: number, apelido: string, ... }
+  usuario?: any;
 }
 
 @Component({
@@ -46,28 +50,38 @@ export class LoginComponent {
     }
 
     const { apelido, senha } = this.form.getRawValue();
-    const payload = { apelido, senha }; // compatível com seu backend atual
+    const payload = { apelido, senha };
 
     this.loading = true;
 
-     this.http.post<LoginResponse>(this.apiUrl, payload)
+    this.http.post<LoginResponse>(this.apiUrl, payload)
       .subscribe({
         next: (res) => {
-          if (res.status === 'OK' && res.apelido) {
+          if (res && res.status === 'OK') {
             this.message = 'Login realizado com sucesso!';
             this.messageColor = 'lightgreen';
 
-            // salva o apelido REAL vindo do backend
-            localStorage.setItem('apelido', res.apelido);
-            localStorage.setItem('tipo', 'usuario');
+            const apelidoReal = res.apelido ?? payload.apelido;
+            localStorage.setItem('apelido', apelidoReal);
+
+            const tipo = res.tipo ?? (res.usuario?.tipo) ?? 'usuario';
+            localStorage.setItem('tipo', tipo);
+
+            const maybeId = (res as any).id ?? (res as any).usuario?.id ?? (res as any).usuarioId ?? null;
+            if (maybeId && !isNaN(Number(maybeId)) && Number(maybeId) > 0) {
+              localStorage.setItem('usuarioId', String(maybeId));
+            } else {
+              console.warn('Login OK mas user id não retornado pelo backend. Para funcionalidades de favoritos, o backend deve retornar o id do usuário no login.');
+            }
 
             setTimeout(() => this.router.navigate(['/home']), 800);
           } else {
-            this.message = res.mensagem || 'Usuário ou senha incorretos!';
+            this.message = res?.mensagem || 'Usuário ou senha incorretos!';
             this.messageColor = 'red';
           }
         },
-        error: () => {
+        error: (err) => {
+          console.error('Erro no login:', err);
           this.message = 'Erro ao conectar ao servidor!';
           this.messageColor = 'red';
         },

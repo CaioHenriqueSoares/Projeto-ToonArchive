@@ -1,118 +1,249 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FavoritosService } from '../services/favoritos.service';
+import { Subscription, interval } from 'rxjs';
+
+type Manga = any; // ajuste com sua interface real se desejar
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  API_BASE = 'http://localhost:8080';
 
-  // UI state
+  API_BASE = 'http://localhost:8080'; // ajuste se precisar
+
+  // estados usados no template
+  recentes: Manga[] = [];
+  destaques: Manga[] = [];   // obras com mais favoritos (ordenadas desc)
+  favoritos: Manga[] = [];  // obras favoritadas pelo usuário atual
+  resultados: any[] = [];
+  termo: string = '';
+  resultadosVisiveis = false;
+  apelido: string | null = null;
+  carrossel: any[] = [];
+
+  // carousel / banner
+  slideAtual = 0;
+  slideIntervalMs = 6000;
+  private slideSub?: Subscription;
+
+  // rolagem containers: nomes usados nas setas
+  // erro flags
+  erroRecentes = false;
+  erroDestaques = false;
+  erroFavoritos = false;
+
+  // UI: overlay/menu
   menuAtivo = false;
   overlayAtivo = false;
   menuUsuarioAtivo = false;
   logoutAtivo = false;
 
-  // Carrossel
-  slideAtual = 0;
-  private slideTimer?: any;
-
-  // Busca
-  termo = '';
-  resultados: any[] = [];
-  resultadosVisiveis = false;
-
-  // Dados
-  recentes: any[] = [];
-  erroRecentes = false;
-
-  destaques = [
-    { img: 'assets/CapaMangaBleach.png', titulo: 'Bleach' },
-    { img: 'assets/CapaMangaSoloLeveling.png', titulo: 'Solo Leveling' },
-    { img: 'assets/CapaMangaGachiakuta.png', titulo: 'Gachiakuta' }
-  ];
-  favoritos = [
-    { img: 'assets/CapaHqMotoqueiroFantasma.png', titulo: 'Motoqueiro Fantasma' },
-    { img: 'assets/CapaHqTartarugasNinja.png', titulo: 'Tartarugas Ninjas' },
-    { img: 'assets/CapaMangaGkkg.png', titulo: 'Gokurakugai' }
-  ];
-
-  apelido = localStorage.getItem('apelido') || '';
-
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private favService: FavoritosService
+  ) {}
 
   ngOnInit(): void {
+    this.apelido = localStorage.getItem('apelido') || '';
+
+    // carregar tudo
     this.carregarRecentes();
-    this.slideTimer = setInterval(() => this.goToSlide(this.slideAtual + 1), 5000);
+    this.carregarDestaques();
+    this.carregarFavoritosUsuario();
+
+    // iniciar auto-slide do banner
+    this.slideSub = interval(this.slideIntervalMs).subscribe(() => {
+      this.slideAtual = (this.slideAtual + 1) % 3;
+    });
+
+    this.carregarCarrossel();
   }
 
   ngOnDestroy(): void {
-    if (this.slideTimer) clearInterval(this.slideTimer);
+    this.slideSub?.unsubscribe();
   }
 
-  // Header/menu
-  toggleMenu() { this.menuAtivo = !this.menuAtivo; this.overlayAtivo = this.menuAtivo; }
-  fecharMenu() { this.menuAtivo = false; this.overlayAtivo = false; }
-  onUsuarioClick(e: MouseEvent) { e.stopPropagation(); this.menuUsuarioAtivo = !this.menuUsuarioAtivo; }
-  @HostListener('document:click') onDocClick() { this.menuUsuarioAtivo = false; }
 
-  // Navegação
-  ir(path: string) { this.router.navigate([path]); }
-
-  // Carrossel
-  goToSlide(i: number) {
-    const total = 3;
-    this.slideAtual = (i + total) % total;
+  carregarRecentes(): void {
+    this.http.get<Manga[]>(`${this.API_BASE}/mangas`)
+      .subscribe({
+        next: (mangas) => {
+          try {
+            this.recentes = mangas
+              .slice()
+              .sort((a, b) => {
+                const da = new Date(a.dataPublicacao || a.data_publicacao || 0).getTime();
+                const db = new Date(b.dataPublicacao || b.data_publicacao || 0).getTime();
+                return db - da;
+              })
+              .slice(0, 20); // controla quantos mostrar
+            this.erroRecentes = false;
+          } catch (e) {
+            console.warn('Erro ao processar recentes', e);
+            this.recentes = [];
+            this.erroRecentes = true;
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao carregar recentes', err);
+          this.recentes = [];
+          this.erroRecentes = true;
+        }
+      });
   }
 
-  // Listas horizontais
-  rolar(id: string, direcao: number) {
-    const el = document.getElementById(id);
-    if (el) el.scrollBy({ left: 300 * direcao, behavior: 'smooth' });
-  }
-
-  // Recentes
-  carregarRecentes() {
-    this.erroRecentes = false;
-    this.http.get<any[]>(`${this.API_BASE}/mangas`).subscribe({
-      next: (mangas) => {
-        this.recentes = (mangas || []).sort(
-          (a, b) => new Date(b?.dataPublicacao || 0).getTime() - new Date(a?.dataPublicacao || 0).getTime()
-        );
-      },
-      error: () => { this.erroRecentes = true; }
-    });
-  }
-
-  // Busca
-  onBuscar() {
-    const t = this.termo.trim();
-    if (t.length < 2) { this.resultados = []; this.resultadosVisiveis = false; return; }
-    this.http.get<any[]>(`${this.API_BASE}/mangas/buscar?nome=${encodeURIComponent(t)}`).subscribe({
-      next: (mangas) => { this.resultados = mangas || []; this.resultadosVisiveis = true; },
-      error: () => { this.resultados = []; this.resultadosVisiveis = true; }
-    });
-  }
-
-  abrirManga(id: any) {
-  this.router.navigate(['/manga-detalhe'], { queryParams: { id } });
+  carregarCarrossel(): void {
+  this.favService.topFavoritos(3).subscribe({
+    next: (res) => {
+      this.carrossel = res;
+    },
+    error: (err) => {
+      console.error("Erro ao carregar carrossel", err);
+      this.carrossel = [];
+    }
+  });
 }
 
-  // Logout
-  abrirLogout() { this.logoutAtivo = true; }
-  cancelarLogout() { this.logoutAtivo = false; }
-  confirmarLogout() {
-  localStorage.removeItem('usuario');
-  sessionStorage.clear();
-  this.logoutAtivo = false;
-  this.menuUsuarioAtivo = false;
-  this.router.navigate(['/login']);
+
+  // ---------------------------
+  // DESTAQUES (top N do backend por favoritos)
+  // ---------------------------
+  carregarDestaques(limit = 10): void {
+    this.favService.topFavoritos(limit).subscribe({
+      next: (lista: Manga[]) => {
+        // backend já deve retornar mangas ordenados por contagem decrescente
+        this.destaques = lista || [];
+        this.erroDestaques = false;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar destaques', err);
+        this.destaques = [];
+        this.erroDestaques = true;
+      }
+    });
+  }
+
+  // ---------------------------
+  // FAVORITOS DO USUÁRIO
+  // ---------------------------
+  carregarFavoritosUsuario(): void {
+    // FavoritosService deve lançar erro se não houver userId -> tratamos aqui
+    this.favService.listarFavoritosUsuario().subscribe({
+      next: (lista: Manga[]) => {
+        this.favoritos = lista || [];
+        this.erroFavoritos = false;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar favoritos do usuário', err);
+        // se o erro for "usuário não autenticado", você pode deixar vazio e sugerir login
+        this.favoritos = [];
+        this.erroFavoritos = true;
+      }
+    });
+  }
+
+  // ---------------------------
+  // CARROSSEL: usa os top 3 destaques
+  // ---------------------------
+  get carouselItems(): Manga[] {
+    // se já temos destaques, usa os 3 primeiros; se vazio, usa capas estáticas do template
+    return this.destaques.slice(0, 3);
+  }
+
+  goToSlide(index: number): void {
+    this.slideAtual = index;
+  }
+
+  // ---------------------------
+  // BUSCA (ao digitar)
+  // ---------------------------
+  onBuscar(): void {
+    const termo = (this.termo || '').trim();
+    if (!termo) {
+      this.resultados = [];
+      this.resultadosVisiveis = false;
+      return;
+    }
+
+    // seu backend expõe /mangas/buscar?nome=...
+    this.http.get<any[]>(`${this.API_BASE}/mangas/buscar?nome=${encodeURIComponent(termo)}`)
+      .subscribe({
+        next: (r) => {
+          this.resultados = r || [];
+          this.resultadosVisiveis = true;
+        },
+        error: (err) => {
+          console.warn('Erro na busca', err);
+          this.resultados = [];
+          this.resultadosVisiveis = true;
+        }
+      });
+  }
+
+  abrirManga(id: number): void {
+    // navega para a página de detalhe passando query param id
+    this.router.navigate(['/manga-detalhe'], { queryParams: { id } });
+  }
+
+  // ---------------------------
+  // ROLAR (setas) - identifica container por id e desloca
+  // ---------------------------
+  rolar(nome: 'recentes' | 'destaques' | 'favoritos', dir: number): void {
+    const el = document.getElementById(nome);
+    if (!el) return;
+
+    const offset = el.clientWidth * 0.8 * dir; // rola 80% da largura visível
+    el.scrollBy({ left: offset, behavior: 'smooth' });
+  }
+
+  // ---------------------------
+  // NAV / MENU / USUARIO / LOGOUT (pequenas funções utilitárias)
+  // ---------------------------
+  toggleMenu(): void {
+    this.menuAtivo = !this.menuAtivo;
+    this.overlayAtivo = this.menuAtivo;
+  }
+
+  fecharMenu(): void {
+    this.menuAtivo = false;
+    this.overlayAtivo = false;
+  }
+
+  ir(path: string): void {
+    this.router.navigate([path]);
+    this.fecharMenu();
+  }
+
+  onUsuarioClick(event: MouseEvent): void {
+    event.stopPropagation();
+    this.menuUsuarioAtivo = !this.menuUsuarioAtivo;
+  }
+
+  abrirLogout(): void {
+    this.logoutAtivo = true;
+    this.menuUsuarioAtivo = false;
+  }
+
+  confirmarLogout(): void {
+    // limpa localStorage (ajuste conforme seu fluxo de logout)
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('apelido');
+    localStorage.removeItem('tipo');
+    this.logoutAtivo = false;
+    this.apelido = '';
+    this.router.navigate(['/login']);
+  }
+
+  cancelarLogout(): void {
+    this.logoutAtivo = false;
   }
 }

@@ -9,12 +9,21 @@
   <!-- CARD DO MANGÁ -->
   <ng-container *ngIf="manga; else carregandoManga">
     <section class="manga-card">
-      <img class="manga-cover" [src]="API + manga.capa" [alt]="'Capa de ' + manga.nome">
+      <div class="cover-container">
+        <img class="manga-cover" [src]="API + manga.capa" [alt]="'Capa de ' + manga.nome">
+
+        <!-- botão estrela sobreposto (top-right) -->
+        <button class="star-btn" (click)="onToggleFavorito()" [class.active]="isFav" [disabled]="favoritoLoading"
+          [attr.aria-pressed]="isFav" title="{{ isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
+          <span class="star-char">★</span>
+        </button>
+      </div>
 
       <div class="manga-info">
         <h2 class="manga-title">{{ manga.nome }}</h2>
 
-        <p class="manga-meta"><strong>Autor:</strong> {{ manga.autor }} <span *ngIf="isAuthor" class="tag-autor">(Você)</span></p>
+        <p class="manga-meta"><strong>Autor:</strong> {{ manga.autor }} <span *ngIf="isAuthor"
+            class="tag-autor">(Você)</span></p>
         <p class="manga-meta"><strong>Editora:</strong> {{ manga.editora || '-' }}</p>
         <p class="manga-meta"><strong>Ano:</strong> {{ manga.ano || '-' }}</p>
 
@@ -27,6 +36,7 @@
         </button>
       </div>
     </section>
+
   </ng-container>
 
   <ng-template #carregandoManga>
