@@ -165,6 +165,7 @@ export class PublicarCapituloComponent {
       // Assume-se que a tela de detalhes do mangá usa 'id' como query param
       this.router.navigate(['/manga-detalhe'], { queryParams: { id: this.mangaId } }); 
     } else {
+      console.log('mangaId não encontrado');
       // Se não houver ID (erro), volta para a home
       this.router.navigate(['/home']);
     }

@@ -11,6 +11,8 @@ import { CadastroComponent } from './cadastro/cadastro.component';
 import { PublicarObraComponent } from './publicar-obra/publicar-obra.component';
 import { MangaDetalheComponent } from './manga-detalhe/manga-detalhe.component';
 import { CapituloDetalheComponent } from './capitulo-detalhe/capitulo-detalhe.component';
+import { GerenciarCapituloComponent } from './gerenciar-capitulo/gerenciar-capitulo.component';
+import { EditarCapituloComponent } from './editar-capitulo/editar-capitulo.component';
 
 @NgModule({
   
@@ -24,7 +26,9 @@ import { CapituloDetalheComponent } from './capitulo-detalhe/capitulo-detalhe.co
     CadastroComponent,
     PublicarObraComponent,
     MangaDetalheComponent,
-    CapituloDetalheComponent
+    CapituloDetalheComponent,
+    GerenciarCapituloComponent,
+    EditarCapituloComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

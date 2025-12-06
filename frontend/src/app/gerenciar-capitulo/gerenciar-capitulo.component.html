@@ -1,0 +1,21 @@
+<div class="container">
+  <h2>Gerenciar Capítulos</h2>
+
+  <div *ngIf="carregando" class="loading">Carregando capítulos...</div>
+
+  <div *ngIf="!carregando && capitulos.length === 0" class="empty">
+    Nenhum capítulo encontrado.
+  </div>
+
+  <div *ngFor="let cap of capitulos" class="chapter-item">
+    <span><strong>{{ cap.tituloCapitulo || ('Capítulo ' + (cap.numero || '?')) }}</strong></span>
+
+    <div class="actions">
+      <button (click)="editarCapitulo(cap.id)">✏️ Editar</button>
+      <button class="delete-btn" (click)="deletarCapitulo(cap.id, cap.tituloCapitulo)">❌ Excluir</button>
+    </div>
+  </div>
+
+  <button class="add-btn" (click)="adicionarCapitulo()">➕ Adicionar Novo Capítulo</button>
+  <a class="back-link" (click)="voltar()">← Voltar</a>
+</div>

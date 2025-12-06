@@ -8,6 +8,8 @@ import { PublicarObraComponent } from './publicar-obra/publicar-obra.component';
 import { MangaDetalheComponent } from './manga-detalhe/manga-detalhe.component';
 import { PublicarCapituloComponent } from './publicar-capitulo/publicar-capitulo.component';
 import { CapituloDetalheComponent } from './capitulo-detalhe/capitulo-detalhe.component';
+import { GerenciarCapituloComponent } from './gerenciar-capitulo/gerenciar-capitulo.component';
+import { EditarCapituloComponent } from './editar-capitulo/editar-capitulo.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -17,7 +19,9 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'manga-detalhe', component: MangaDetalheComponent },
   { path: 'publicar-capitulo', component: PublicarCapituloComponent },
-  { path: 'capitulo-detalhe', component: CapituloDetalheComponent }
+  { path: 'capitulo-detalhe', component: CapituloDetalheComponent },
+  { path: 'gerenciar-capitulo', component: GerenciarCapituloComponent },
+  { path: 'editar-capitulo', component: EditarCapituloComponent }
 ];
 
 @NgModule({

@@ -163,8 +163,17 @@ header input {
 .dot.active { background-color: white; }
 
 /* ===== Catálogo ===== */
-.catalogo { padding: 20px; }
-h2 { color: white; }
+.catalogo h2 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #E0D7FF; /* tom suave lilás/branco */
+  text-shadow: 0 0 6px rgba(157, 78, 221, 0.4);
+  margin: 20px 0 12px;
+  border-left: 4px solid #9d4edd;
+  padding-left: 10px;
+}
 
 .mangas {
   display: flex;

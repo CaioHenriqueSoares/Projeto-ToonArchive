@@ -296,7 +296,7 @@ onToggleFavorito(): void {
     if (!this.manga) return;
 
     this.router.navigate(
-      ['/publicar-capitulo'],
+      ['/gerenciar-capitulo'],
       { queryParams: { id: this.manga.id } }
     );
   }
