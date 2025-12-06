@@ -1,1 +1,45 @@
-<p>editar-capitulo.component works!</p>
+<header>
+  <a [routerLink]="['/home']"><img src="assets/logo.png" alt="Toon Archive"></a>
+</header>
+
+<main>
+  <h2>Editar Capítulo</h2>
+
+  <form [formGroup]="editForm" (ngSubmit)="onSubmit()" novalidate>
+    <label for="tituloCapitulo">Título do Capítulo</label>
+    <input id="tituloCapitulo" formControlName="tituloCapitulo" type="text" />
+
+    <label for="numero">Número do Capítulo</label>
+    <input id="numero" formControlName="numero" type="text" />
+
+    <label for="paginas">Substituir / Adicionar Páginas (opcional)</label>
+    <input id="paginas" type="file" (change)="onFilesSelected($event)" accept=".png,.jpg,.jpeg" multiple>
+
+    <!-- Preview unificado: exibe páginas existentes e novas (pages) -->
+    <div class="preview-container" *ngIf="pages.length > 0" aria-label="Pré-visualização das páginas">
+      <div
+        class="image-box"
+        *ngFor="let p of pages; let i = index"
+        draggable="true"
+        (dragstart)="onDragStart(i)"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop(i)"
+        (dragend)="dragIndex = null"
+        title="Arraste para reordenar"
+      >
+        <img [src]="p.url" [alt]="'Página ' + (i + 1)" />
+        <button type="button" class="remove-individual" (click)="removePage(i)" aria-label="Remover página {{i+1}}">×</button>
+        <div class="order-badge">{{ i + 1 }}</div>
+        <span class="new-badge" *ngIf="p.isNew">novo</span>
+      </div>
+    </div>
+
+    <!-- Mensagem se não houver páginas -->
+    <div class="empty" *ngIf="!pages || pages.length === 0">
+      Nenhuma página adicionada.
+    </div>
+
+    <button type="submit" [disabled]="saving">Salvar Alterações</button>
+    <button type="button" class="back-link" (click)="voltar()">← Voltar</button>
+  </form>
+</main>
