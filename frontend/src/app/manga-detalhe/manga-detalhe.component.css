@@ -388,6 +388,37 @@
   background-color: #b266ff;
 }
 
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* botão de excluir (vermelho) */
+.delete-manga-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  background-color: #d64545; /* vermelho forte */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.08s ease;
+}
+
+.delete-manga-btn:hover:not([disabled]) {
+  background-color: #e35b5b;
+  transform: translateY(-2px);
+}
+
+.delete-manga-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
 
 /* ===== FOOTER ===== */
 

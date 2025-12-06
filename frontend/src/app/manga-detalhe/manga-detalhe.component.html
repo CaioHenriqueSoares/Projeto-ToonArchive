@@ -31,9 +31,16 @@
           {{ manga.descricao }}
         </p>
 
-        <button class="manage-btn" *ngIf="isAdmin || isAuthor" (click)="irParaGerenciarCapitulos()">
-          ⚙ Gerenciar Capítulos
-        </button>
+        <div *ngIf="isAdmin || isAuthor" class="action-buttons">
+          <button class="manage-btn" (click)="irParaGerenciarCapitulos()">
+            ⚙ Gerenciar Capítulos
+          </button>
+
+          <button class="delete-manga-btn" (click)="excluirManga()" [disabled]="deletingManga"
+            title="Excluir este mangá (irreversível)">
+            {{ deletingManga ? 'Excluindo…' : '🗑️ Excluir Mangá' }}
+          </button>
+        </div>
       </div>
     </section>
 

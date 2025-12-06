@@ -102,161 +102,137 @@ main {
   display: block;
 }
 
-/* COMENTÁRIOS */
-#comentarios-container {
-  max-width: 800px;
-  width: 100%;
-  padding: 20px;
+/* ===== CARD DE COMENTÁRIOS ===== */
+
+.comments-card {
   background-color: #1B1C22;
-  border-radius: 15px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  margin-top: 30px;
-}
-
-#comentarios-container h2 {
-  text-align: left;
-  margin-bottom: 20px;
-}
-
-.comentario-form {
-  margin-bottom: 25px;
-}
-
-.comentario-form textarea {
+  border-radius: 14px;
+  padding: 20px 26px 24px;
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  background-color: #0A1014;
-  color: #eee;
-  resize: vertical;
-  min-height: 80px;
-  margin-bottom: 10px;
+  max-width: 720px;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
 }
 
-.comentario-form button {
-  background-color: #9d4edd;
-  color: #fff;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.comments-card h3 {
+  margin: 0 0 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 6px;
+  font-size: 15px;
 }
 
-.comentario-form button:hover:not([disabled]) {
-  background-color: #b266ff;
-}
-
-.comentario-form button:disabled {
-  background-color: #333;
-  cursor: not-allowed;
-}
+/* ===== ITENS ===== */
 
 .comentario-item {
-  background-color: #2a2c35;
-  padding: 15px;
+  background-color: #16161c;
+  padding: 14px 16px 10px 16px;
+  margin-bottom: 16px;
   border-radius: 10px;
-  margin-bottom: 15px;
-  text-align: left;
-  position: relative;
+  border: 1px solid #252525;
+  transition: all .2s ease-in-out;
 }
 
+.comentario-item:hover {
+  background-color: #1e1e24;
+}
+
+/* Título + botões */
 .comentario-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  align-items: center;
 }
 
-.comentario-autor {
-  color: #9d4edd;
+/* Autor */
+.autor {
   font-weight: bold;
+  color: #b266ff;
+  font-size: 14px;
+}
+
+.tag-autor {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #9d4edd;
+  font-weight: 600;
+}
+
+
+/* ------ BOTÕES EDITAR / EXCLUIR ------ */
+
+.comentario-acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.comentario-acoes button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: color .2s, transform .2s;
+}
+
+.comentario-acoes button:hover {
+  color: #b266ff;
+  transform: scale(1.15);
+}
+
+/* ===== TEXTO ===== */
+
+.comentario-texto {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #ddd;
 }
 
 .comentario-data {
   font-size: 12px;
   color: #aaa;
+  margin-top: 8px;
+  display: block;
+  text-align: right;
 }
 
-.comentario-texto {
-  margin: 0;
-  white-space: pre-wrap;
-}
+/* ===== ÁREA DE EDIÇÃO ===== */
 
-.comentario-actions {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-}
-
-.comentario-actions button {
-  background: none;
-  border: none;
-  color: #ccc;
-  cursor: pointer;
-  margin-left: 10px;
-  font-size: 14px;
-}
-
-.comentario-actions button:hover {
-  color: #fff;
-}
-
-/* Edição e Exclusão */
-.comentario-edicao textarea {
+.comentario-editar-area {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
+  background-color: #111;
+  color: #fff;
   border: 1px solid #333;
-  background-color: #0A1014;
-  color: #eee;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
   resize: vertical;
-  min-height: 80px;
-  margin-bottom: 10px;
 }
 
-.edicao-botoes {
-  display: flex;
-  gap: 10px;
-}
-
-.comentario-salvar-btn {
-  background-color: #4CAF50;
+.comentario-salvar-btn,
+.comentario-cancelar-btn {
+  background-color: #9d4edd;
   color: white;
-  padding: 8px 15px;
   border: none;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
+  margin-right: 6px;
+  transition: background .3s;
 }
 
 .comentario-cancelar-btn {
-  background-color: #f44336;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  background-color: #333;
 }
 
-.confirmacao-exclusao {
-  background-color: #f4433620;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
+.comentario-salvar-btn:hover {
+  background-color: #b266ff;
 }
 
-.confirmacao-exclusao p {
-  margin-top: 0;
-  color: #f44336;
-  font-weight: bold;
-}
-
-.login-msg,
-.empty-text {
-  color: #aaa;
-  font-style: italic;
-  margin-top: 20px;
+.comentario-cancelar-btn:hover {
+  background-color: #555;
 }
 
 /* ==============================================

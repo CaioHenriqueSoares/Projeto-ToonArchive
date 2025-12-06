@@ -28,6 +28,7 @@
         </button>
 
       </div>
+
       <h2 class="chapter-header">
         <span class="chapter-number">Cap. {{ capitulo.numero }}</span>
         <span class="chapter-title">{{ capitulo.tituloCapitulo }}</span>
@@ -40,79 +41,91 @@
         <button class="page-nav-btn" (click)="paginaAnterior()">
           &#9664; Anterior
         </button>
+
         <span class="page-counter">
           Página {{ paginaAtualIndex + 1 }} / {{ paginas.length }}
         </span>
+
         <button class="page-nav-btn" (click)="proximaPagina()">
           Próxima &#9654;
         </button>
       </div>
 
       <div class="pagina-wrapper">
-        <img *ngIf="paginaAtual" [src]="paginaAtual.url" [alt]="'Página ' + paginaAtual.ordem" class="pagina-imagem" />
+        <img *ngIf="paginaAtual"
+             [src]="paginaAtual.url"
+             [alt]="'Página ' + paginaAtual.ordem"
+             class="pagina-imagem" />
         <p *ngIf="!paginaAtual" class="empty-text">Erro ao carregar a página.</p>
       </div>
 
     </section>
 
-    <section id="comentarios-container">
-      <h2>Comentários</h2>
+    <!-- CARD DE COMENTÁRIOS -->
+  <section class="comments-card">
+    <h3>Comentários</h3>
 
-      <form *ngIf="usuarioAtual" (ngSubmit)="enviarComentario()" class="comentario-form">
-        <textarea [(ngModel)]="comentarioTexto" name="comentarioTexto" placeholder="Escreva seu comentário aqui..."
-          required></textarea>
-        <button type="submit" [disabled]="!comentarioTexto.trim()">Enviar Comentário</button>
-      </form>
+    <!-- ITEM DO COMENTÁRIO -->
+    <div class="comentario-item" *ngFor="let c of comentarios">
+      <div class="comentario-header">
+        <span class="autor">{{ c.autor }}</span>
 
-      <p *ngIf="!usuarioAtual" class="login-msg">
-        Faça login para poder comentar neste capítulo.
-      </p>
+        <!-- BOTÕES DE EDITAR / EXCLUIR -->
+        <div class="comentario-acoes" *ngIf="podeGerirComentario(c)">
+          <!-- iniciar edição -->
+          <button type="button" class="acao editar" *ngIf="!c.emEdicao && !c.confirmandoExclusao"
+            (click)="iniciarEdicao(c)">✏️</button>
 
-      <ng-container *ngIf="comentariosCarregados; else carregandoComentarios">
-        <div *ngIf="comentarios.length === 0" class="empty-text">Nenhum comentário ainda. Seja o primeiro!</div>
-
-        <div *ngFor="let c of comentarios" class="comentario-item">
-          <div class="comentario-header">
-            <strong class="comentario-autor">{{ c.autor }}</strong>
-            <span class="comentario-data">
-              {{ c.dataHora | date:'short' }}
-            </span>
-          </div>
-
-          <div class="comentario-actions"
-            *ngIf="usuarioAtual && (c.autor === usuarioAtual || isAdmin) && !c.emEdicao && !c.confirmandoExclusao">
-            <button (click)="iniciarEdicao(c)">✏️ Editar</button>
-            <button (click)="pedirConfirmacaoExclusao(c)">🗑️ Excluir</button>
-          </div>
-
-          <p *ngIf="!c.emEdicao" class="comentario-texto">{{ c.texto }}</p>
-
-          <div *ngIf="c.emEdicao" class="comentario-edicao">
-            <textarea [(ngModel)]="c.texto" name="edicaoTexto" required></textarea>
-
-            <div class="edicao-botoes">
-              <button type="button" class="comentario-salvar-btn" (click)="salvarEdicao(c)">
-                💾 Salvar
-              </button>
-
-              <button type="button" class="comentario-cancelar-btn" (click)="cancelarEdicao(c)">
-                ❌ Cancelar
-              </button>
-            </div>
-          </div>
-
-          <div *ngIf="c.confirmandoExclusao" class="confirmacao-exclusao">
-            <p>Tem certeza que deseja excluir este comentário?</p>
-            <button type="button" class="comentario-salvar-btn" (click)="excluirComentario(c)">🗑️ Excluir</button>
-            <button type="button" class="comentario-cancelar-btn" (click)="cancelarExclusao(c)">❌ Cancelar</button>
-          </div>
+          <!-- iniciar confirmação de exclusão -->
+          <button type="button" class="acao excluir" *ngIf="!c.emEdicao && !c.confirmandoExclusao"
+            (click)="pedirConfirmacaoExclusao(c)">🗑️</button>
         </div>
-      </ng-container>
+      </div>
 
-      <ng-template #carregandoComentarios>
-        <p class="empty-text">Carregando comentários...</p>
-      </ng-template>
+      <!-- MODO NORMAL (mostrar texto) -->
+      <div class="comentario-texto" *ngIf="!c.emEdicao && !c.confirmandoExclusao">
+        {{ c.texto }}
+      </div>
 
-    </section>
+      <!-- MODO EDIÇÃO -->
+      <div *ngIf="c.emEdicao" style="margin-top:8px;">
+        <textarea class="comentario-editar-area" [(ngModel)]="c.textoEditado" name="textoEditado_{{c.id}}">
+    </textarea>
+
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button type="button" class="comentario-salvar-btn" (click)="salvarEdicao(c)" [disabled]="c.saving">
+            {{ c.saving ? 'Salvando…' : '💾 Salvar' }}
+          </button>
+
+          <button type="button" class="comentario-cancelar-btn" (click)="cancelarEdicao(c)" [disabled]="c.saving">
+            ❌ Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- CONFIRMAÇÃO DE EXCLUSÃO -->
+      <div *ngIf="c.confirmandoExclusao" style="margin-top:8px; text-align:center;">
+        <button type="button" class="comentario-salvar-btn" (click)="confirmarExclusao(c)">🗑️ Excluir</button>
+        <button type="button" class="comentario-cancelar-btn" (click)="cancelarExclusao(c)">❌ Cancelar</button>
+      </div>
+
+      <!-- DATA -->
+      <span class="comentario-data">
+        {{ c.dataHora | date:'short' }}
+      </span>
+    </div>
+
+    <ng-template #carregandoComentarios>
+      <p class="empty-text">Carregando comentários...</p>
+    </ng-template>
+
+    <!-- FORM -->
+    <form (ngSubmit)="enviarComentario()" class="comment-form">
+      <textarea [(ngModel)]="comentarioTexto" name="comentarioTexto" placeholder="Escreva um comentário..." required>
+    </textarea>
+      <button type="submit" class="comment-submit">Enviar</button>
+    </form>
+  </section>
+
   </ng-template>
 </main>

@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FavoritosService } from '../services/favoritos.service';
+import { lastValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-manga-detalhe',
@@ -28,6 +30,7 @@ export class MangaDetalheComponent implements OnInit {
   usuarioAtual: string = '';
   isFav = false;
   favoritoLoading: boolean = false;
+  deletingManga: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -289,6 +292,31 @@ onToggleFavorito(): void {
   // inicia confirmação (use isso no template: (click)="iniciarExclusao(c)" )
   iniciarExclusao(c: any): void {
     this.pedirConfirmacaoExclusao(c);
+  }
+
+  async excluirManga(): Promise<void> {
+    // proteção extra
+    if (!this.manga || !this.manga.id) return;
+
+    const confirmacao = confirm(`Tem certeza que deseja excluir o mangá "${this.manga.nome}"? Esta ação é irreversível.`);
+    if (!confirmacao) return;
+
+    this.deletingManga = true;
+
+    try {
+      // chama endpoint de delete
+      await lastValueFrom(this.http.delete(`${this.API}/mangas/${this.manga.id}`, { observe: 'response' } as any));
+      // sucesso — redireciona para home e notifica
+      alert('Mangá excluído com sucesso.');
+      this.router.navigate(['/home']);
+    } catch (err: any) {
+      console.error('Erro ao excluir mangá:', err);
+      // tenta extrair mensagem amigável
+      const msg = err?.error && typeof err.error === 'string' ? err.error : 'Não foi possível excluir o mangá. Tente novamente.';
+      alert(msg);
+    } finally {
+      this.deletingManga = false;
+    }
   }
 
   // --- navegação ---

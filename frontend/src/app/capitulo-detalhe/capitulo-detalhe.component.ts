@@ -36,7 +36,7 @@ export class CapituloDetalheComponent implements OnInit {
   capituloId: string | null = null;
   capitulo: any = null;
   paginas: Pagina[] = [];
-  comentarios: Comentario[] = [];
+  comentarios: any[] = [];
   paginaAtualIndex: number = 0;
   paginaAtual: Pagina | null = null;
 
@@ -241,109 +241,125 @@ export class CapituloDetalheComponent implements OnInit {
     }
   }
 
+  // === MÉTODOS DE COMENTÁRIOS ===
   carregarComentarios(id: string): void {
-    this.comentariosCarregados = false;
-    this.http.get<any[]>(`${this.API}/comentarios/capitulo/${this.capituloId}`).subscribe({
-      next: (c) => {
-        // Mapeia para adicionar propriedades de UI (emEdicao, etc.)
-        this.comentarios = c.map(comentario => ({
-          ...comentario,
+    this.http.get<any[]>(`${this.API}/comentarios/manga/${id}`)
+      .subscribe((coms) => {
+        // adiciona flags locais para UI (edição / confirmação)
+        this.comentarios = coms.map(c => ({
+          ...c,
           emEdicao: false,
-          antigoTexto: comentario.texto,
+          textoEditado: c.texto,
           confirmandoExclusao: false
         }));
-        this.comentariosCarregados = true;
-      },
-      error: (err) => {
-        console.error('Erro ao carregar comentários:', err);
-        this.comentariosCarregados = true;
-      }
-    });
+      });
   }
 
-  // === MÉTODOS DE COMENTÁRIOS ===
+  // --- permissão para editar/excluir ---
+  podeGerirComentario(c: any): boolean {
+    const autor = (c?.autor || '').trim();
+    const usuario = (this.usuarioAtual || '').trim();
+    // compara sensível à caixa, ajuste se quiser case-insensitive
+    return this.isAdmin || (!!usuario && usuario === autor);
+  }
 
+  // --- envio de comentário ---
   enviarComentario(): void {
-    const texto = this.comentarioTexto.trim();
-    if (!texto || !this.capituloId) return;
+    const mangaId = this.route.snapshot.queryParamMap.get('id');
+    const texto = (this.comentarioTexto || '').trim();
 
-    const novoComentario = {
-      autor: this.usuarioAtual || 'Anônimo',
-      texto: texto,
-      capitulo: { id: Number(this.capituloId) }
-    };
+    if (!mangaId || !texto) return;
 
-    this.http.post<Comentario>(`${this.API}/comentarios`, novoComentario).subscribe({
-      next: (res) => {
-        // Adiciona o novo comentário (incluindo as props de UI)
-        this.comentarios.unshift({
-          ...res,
-          emEdicao: false,
-          antigoTexto: res.texto,
-          confirmandoExclusao: false
-        });
-        this.comentarioTexto = ''; // Limpa o formulário
-      },
-      error: (err) => {
-        console.error('Erro ao enviar comentário:', err);
-        alert('Falha ao enviar comentário.');
-      }
+    const autor = this.usuarioAtual || 'Anônimo';
+
+    this.http.post(`${this.API}/comentarios`, {
+      autor,
+      texto,
+      manga: { id: Number(mangaId) }
+    }).subscribe(() => {
+      this.comentarioTexto = '';
+      this.carregarComentarios(mangaId);
     });
   }
 
-  // --- Edição ---
-
-  iniciarEdicao(c: Comentario): void {
+  // --- edição inline ---
+  iniciarEdicao(c: any): void {
     c.emEdicao = true;
-    c.antigoTexto = c.texto;
     c.confirmandoExclusao = false;
+    c.textoEditado = c.texto;
   }
 
-  cancelarEdicao(c: Comentario): void {
+  cancelarEdicao(c: any): void {
     c.emEdicao = false;
-    c.texto = c.antigoTexto; // Restaura o texto original
+    c.textoEditado = c.texto;
   }
 
-  salvarEdicao(c: Comentario): void {
-    if (c.texto.trim() === c.antigoTexto.trim()) {
+  salvarEdicao(c: any): void {
+    // debug rápido
+    console.log('[DEBUG] salvarEdicao chamado para id=', c?.id, 'textoEditado=', c?.textoEditado);
+
+    const novoTexto = (c.textoEditado || '').trim();
+    if (!novoTexto) {
+      // nada a salvar (ou texto vazio)
       c.emEdicao = false;
+      c.textoEditado = c.texto;
       return;
     }
 
-    this.http.put<any>(`${this.API}/comentarios/${c.id}`, { texto: c.texto }).subscribe({
-      next: () => {
-        c.emEdicao = false;
-        c.antigoTexto = c.texto;
-      },
-      error: (err) => {
-        console.error('Erro ao salvar edição:', err);
-        alert('Não foi possível salvar a edição. Tente novamente.');
-      }
-    });
+    // bloqueia múltiplos clicks
+    c.saving = true;
+
+    const payload = { texto: novoTexto };
+
+    this.http.put(`${this.API}/comentarios/${c.id}`, payload)
+      .subscribe({
+        next: (res: any) => {
+          // se a API retornou o comentário atualizado, usa; senão atualiza localmente
+          if (res && res.texto !== undefined) {
+            c.texto = res.texto;
+          } else {
+            c.texto = novoTexto;
+          }
+          c.emEdicao = false;
+          c.saving = false;
+          console.log('[DEBUG] salvarEdicao sucesso', c.id);
+        },
+        error: (err) => {
+          c.saving = false;
+          console.error('[DEBUG] salvarEdicao erro', err);
+          alert('Não foi possível salvar o comentário. Verifique a conexão ou tente novamente.');
+        }
+      });
   }
 
-  // --- Exclusão ---
 
-  pedirConfirmacaoExclusao(c: Comentario): void {
+  // --- exclusão com confirmação inline ---
+  pedirConfirmacaoExclusao(c: any): void {
     c.confirmandoExclusao = true;
     c.emEdicao = false;
   }
 
-  cancelarExclusao(c: Comentario): void {
+  cancelarExclusao(c: any): void {
     c.confirmandoExclusao = false;
   }
 
-  excluirComentario(c: Comentario): void {
-    this.http.delete(`${this.API}/comentarios/${c.id}`).subscribe({
-      next: () => {
-        // Remove o comentário da lista local
-        this.comentarios = this.comentarios.filter(com => com.id !== c.id);
-      },
-      error: (err) => {
-        console.error('Erro ao excluir comentário:', err);
-        alert('Não foi possível excluir o comentário. Tente novamente.');
-      }
-    });
+  confirmarExclusao(c: any): void {
+    this.http.delete(`${this.API}/comentarios/${c.id}`)
+      .subscribe(() => {
+        this.comentarios = this.comentarios.filter(x => x.id !== c.id);
+      }, () => {
+        // opcional: tratar erro
+      });
+  }
+
+  // wrapper do editar (mantém compatibilidade com templates que chamam editarComentario)
+  editarComentario(c: any): void {
+    this.iniciarEdicao(c);
+  }
+
+  // inicia confirmação (use isso no template: (click)="iniciarExclusao(c)" )
+  iniciarExclusao(c: any): void {
+    this.pedirConfirmacaoExclusao(c);
   }
 
   // === NAVEGAÇÃO ===
