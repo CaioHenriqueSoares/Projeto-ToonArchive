@@ -17,28 +17,28 @@
 
 .card {
   background: #0d0d10;
-  padding: 40px 45px;
-  border-radius: 16px;
+  padding: 48px 55px;              /* Aumentado */
+  border-radius: 18px;             /* Leve aumento */
   width: 100%;
-  max-width: 380px;
-  box-shadow: 0 0 30px rgba(181, 79, 255, 0.15);
+  max-width: 440px;                /* Antes era 380px */
+  box-shadow: 0 0 35px rgba(181, 79, 255, 0.18);
   text-align: center;
   animation: fadeIn 0.6s ease;
 }
 
+/* Animação igual */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Logo igual ao cadastro */
+/* Logo maior (igual ao cadastro) */
 .logo {
   font-family: 'Limelight', cursive;
-  font-size: 28px;
-  font-weight: normal;
+  font-size: 32px;                /* Antes era 28px */
   letter-spacing: 1px;
   text-shadow: 2px 2px 0 #000;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   display: inline-flex;
   gap: 8px;
 }
@@ -46,9 +46,9 @@
 .logo .archive { color: #b54fff; }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 15px;                /* Leve aumento */
   color: #ccc;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 label {
@@ -56,18 +56,18 @@ label {
   text-align: left;
   margin-bottom: 6px;
   color: #ddd;
-  font-size: 14px;
+  font-size: 15px;                /* 14 → 15 */
 }
 
 input {
   width: 100%;
-  padding: 10px;
+  padding: 12px 12px;             /* Levemente maior */
   border-radius: 8px;
   border: 1px solid #222;
   background: #181818;
   color: #fff;
-  margin-bottom: 12px;
-  font-size: 14px;
+  margin-bottom: 14px;
+  font-size: 15px;                /* 14 → 15 */
   transition: 0.2s;
 }
 input::placeholder { color: #8f8f94; }
@@ -82,8 +82,8 @@ button {
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 12px;
-  font-size: 15px;
+  padding: 14px;                  /* Mais alto */
+  font-size: 16px;                /* 15 → 16 */
   width: 100%;
   cursor: pointer;
   font-weight: bold;
@@ -94,14 +94,14 @@ button:hover:not(:disabled) { background: #c671ff; transform: scale(1.02); }
 button:disabled { opacity: 0.7; cursor: not-allowed; }
 
 .mensagem {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 14px;
-  min-height: 20px;
+  min-height: 22px;
 }
 
 .links {
-  margin-top: 15px;
-  font-size: 13px;
+  margin-top: 18px;
+  font-size: 14px;
   color: #aaa;
 }
 .links a { color: #b54fff; text-decoration: none; }
@@ -111,6 +111,6 @@ button:disabled { opacity: 0.7; cursor: not-allowed; }
   display: block;
   text-align: left;
   color: #ff7b7b;
-  font-size: 12px;
-  margin: -6px 0 10px;
+  font-size: 13px;
+  margin: -4px 0 10px;
 }

@@ -20,6 +20,12 @@
     </div>
 
     <div class="header-direita" style="position: relative;">
+      <!-- BOTÕES VISÍVEIS NO HEADER: Publicar e FAQ -->
+      <div class="header-actions">
+        <button class="header-action" (click)="ir('/publicar-obra')" title="Publicar obra">📖 Publicar</button>
+        <button class="header-action ghost" (click)="ir('/faq')" title="FAQ">❓ FAQ</button>
+      </div>
+
       <button id="usuarioBtn" class="usuario-btn" (click)="onUsuarioClick($event)">👤</button>
       <div id="menuUsuario" class="menu-usuario" [class.ativo]="menuUsuarioAtivo" (click)="$event.stopPropagation()">
         <p id="usuarioNome">{{ apelido || '' }}</p>
@@ -29,10 +35,13 @@
   </header>
 
   <nav id="menu-lateral" class="menu-lateral" [class.ativo]="menuAtivo">
+    <div class="menu-top">
+      <img src="assets/logo.png" alt="Toon Archive" class="menu-logo" />
+      <h3 class="menu-title">ToonArchive</h3>
+    </div>
     <ul>
       <li><button (click)="ir('/publicar-obra')">📖 Publicação</button></li>
-      <li><button>🌐 Idioma</button></li>
-      <li><button (click)="ir('/comunidade')">💬 Comunidade</button></li>
+      <li><button (click)="ir('/faq')">❓ FAQ</button></li>
     </ul>
   </nav>
   <div id="overlay" [class.ativo]="overlayAtivo" (click)="fecharMenu()"></div>

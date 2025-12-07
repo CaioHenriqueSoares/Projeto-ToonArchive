@@ -13,6 +13,8 @@ import { MangaDetalheComponent } from './manga-detalhe/manga-detalhe.component';
 import { CapituloDetalheComponent } from './capitulo-detalhe/capitulo-detalhe.component';
 import { GerenciarCapituloComponent } from './gerenciar-capitulo/gerenciar-capitulo.component';
 import { EditarCapituloComponent } from './editar-capitulo/editar-capitulo.component';
+import { FaqComponent } from './faq/faq.component';
+
 
 @NgModule({
   
@@ -28,7 +30,8 @@ import { EditarCapituloComponent } from './editar-capitulo/editar-capitulo.compo
     MangaDetalheComponent,
     CapituloDetalheComponent,
     GerenciarCapituloComponent,
-    EditarCapituloComponent
+    EditarCapituloComponent,
+    FaqComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

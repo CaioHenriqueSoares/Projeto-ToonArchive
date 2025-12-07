@@ -10,6 +10,7 @@ import { PublicarCapituloComponent } from './publicar-capitulo/publicar-capitulo
 import { CapituloDetalheComponent } from './capitulo-detalhe/capitulo-detalhe.component';
 import { GerenciarCapituloComponent } from './gerenciar-capitulo/gerenciar-capitulo.component';
 import { EditarCapituloComponent } from './editar-capitulo/editar-capitulo.component';
+import { FaqComponent } from './faq/faq.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -21,7 +22,8 @@ export const routes: Routes = [
   { path: 'publicar-capitulo', component: PublicarCapituloComponent },
   { path: 'capitulo-detalhe', component: CapituloDetalheComponent },
   { path: 'gerenciar-capitulo', component: GerenciarCapituloComponent },
-  { path: 'editar-capitulo', component: EditarCapituloComponent }
+  { path: 'editar-capitulo', component: EditarCapituloComponent },
+  { path: 'faq', component: FaqComponent }
 ];
 
 @NgModule({

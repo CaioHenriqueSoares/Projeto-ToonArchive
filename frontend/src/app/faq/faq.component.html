@@ -1,0 +1,54 @@
+<section class="faq-page">
+  <header class="faq-header">
+    <a routerLink="/home" class="logo-link">
+      <img src="assets/logo.png" alt="Toon Archive" class="faq-logo" />
+    </a>
+    <h1>FAQ — ToonArchive</h1>
+    <p class="subtitle">Dúvidas frequentes e guia rápido para autores e leitores.</p>
+  </header>
+
+  <main class="faq-main">
+    <div class="controls">
+      <input
+        type="search"
+        placeholder="Pesquisar perguntas ou respostas..."
+        [(ngModel)]="query"
+        aria-label="Pesquisar FAQ"
+      />
+      <div class="ctrl-btns">
+        <button type="button" class="btn small" (click)="expandAll()" title="Expandir tudo">Expandir</button>
+        <button type="button" class="btn small ghost" (click)="collapseAll()" title="Fechar tudo">Fechar</button>
+      </div>
+    </div>
+
+    <div class="faq-list">
+      <article
+        class="faq-item"
+        *ngFor="let f of filteredFaqs()"
+        [attr.data-open]="f.open ? 'true' : 'false'"
+        role="region"
+        [attr.aria-labelledby]="'q-' + f.id"
+      >
+        <header class="faq-q" id="{{'q-' + f.id}}">
+          <button class="q-btn" (click)="toggle(f)" [attr.aria-expanded]="f.open ? 'true' : 'false'">
+            <span class="q-text">{{ f.q }}</span>
+            <span class="q-arrow" aria-hidden="true">{{ f.open ? '−' : '+' }}</span>
+          </button>
+        </header>
+
+        <div class="faq-a" *ngIf="f.open" role="article">
+          <!-- usa o método do TS para formatar e devolver SafeHtml -->
+          <p [innerHTML]="formatAnswer(f.a)"></p>
+        </div>
+      </article>
+
+      <div *ngIf="filteredFaqs().length === 0" class="no-results">
+        Nenhum resultado encontrado para "<strong>{{ query }}</strong>".
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn primary" (click)="voltar()">← Voltar</button>
+    </div>
+  </main>
+</section>
